@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.cms.channel.dao.impl.mybatis.ChannelContentMapper" >
+  <resultMap id="ChannelContentResultMap" type="com.haoyu.sip.cms.channel.entity.ChannelContent" >
+    <id column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+    <result column="CONTENT" property="content" jdbcType="VARCHAR" />
+    <result column="MOBILE_CONTENT" property="mobileContent" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CHANNEL_ID,CONTENT,MOBILE_CONTENT
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ChannelContentResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_CHANNEL_CONTENT M
+    where M.CHANNEL_ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="ChannelContentResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_CHANNEL_CONTENT M
+    where IS_DELETED='N'
+    <if test="channelId!=null and channelId!=''">
+    	AND M.CHANNEL_ID=#{channelId,jdbcType=VARCHAR}
+    </if>
+    <if test="alias!=null and alias!=''">
+    	AND M.CHANNEL_ID IN  (select ID from CMS_CHANNEL CC WHERE CC.ALIAS=#{alias,jdbcType=VARCHAR}
+    	<if test="domain!=null and domain!=''">
+    	 	<bind name="pattern" value="'%' + domain + '%'" />
+    		and CC.RELATION_ID=(select MAX(ID) from CMS_SITE_INFO CSI WHERE CSI.IS_DELETED='N' AND CSI.DOMAIN LIKE  #{pattern})
+    	</if>
+    	)
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.channel.entity.ChannelContent">
+  	insert into CMS_CHANNEL_CONTENT(CHANNEL_ID,CONTENT,MOBILE_CONTENT,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	select ID,#{content,jdbcType=VARCHAR},#{mobileContent,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL}
+  	from CMS_CHANNEL
+  	where ID=#{channelId,jdbcType=VARCHAR}
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.channel.entity.ChannelContent">
+  	update CMS_CHANNEL_CONTENT
+  	<set >
+      <if test="content != null and content!=''" >
+        CONTENT = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="mobileContent != null" >
+        MOBILE_CONTENT = #{mobileContent,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where CHANNEL_ID = #{channelId,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_CHANNEL_CONTENT
+    where CHANNEL_ID=#{id,jdbcType=VARCHAR}
+  </delete>
+</mapper>

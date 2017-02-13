@@ -1,0 +1,8 @@
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\base\entity\BaseEntity.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\entity\Dynamic.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\service\impl\DynamicService.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\service\IDynamicService.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\dao\impl\mybatis\DynamicDao.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\base\utils\BaseServiceUtils.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\dao\IDynamicDao.java
+E:\workshopspace\base\sip\sip-dynamic\sip-dynamic-core\src\main\java\com\haoyu\sip\dynamic\event\CreateDynamicEvent.java

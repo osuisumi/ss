@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthUserRoleMapper" >
+  <resultMap type="com.haoyu.sip.auth.entity.AuthUser" id="authUserResultMap">
+  	<id property="id" column="USER_ID" jdbcType="VARCHAR"/>
+  	<result property="relationId" column="RELATION_ID" jdbcType="VARCHAR"/>
+  	<result property="realName" column="REAL_NAME" jdbcType="VARCHAR"/>
+  	<result property="avatar" column="AVATAR" jdbcType="VARCHAR"/>
+  </resultMap>
+  <select id="selectAuthUserByRoleAndRelation" parameterType="java.util.Map" resultMap="authUserResultMap">
+  	SELECT AUR.USER_ID, AUR.RELATION_ID, BUV.REAL_NAME, BUV.AVATAR
+  	FROM BASE_USER_VIEW BUV
+  	JOIN AUTH_USER_ROLE AUR
+  	ON BUV.ID = AUR.USER_ID
+  	<where>
+  		<if test="role!=null and role.id!=null">
+  			AND AUR.ROLE_ID=#{role.id,jdbcType=VARCHAR}
+  		</if>
+  		<if test="role!=null and role.code!=null">
+  			AND AUR.ROLE_ID IN(SELECT ID FROM AUTH_ROLE WHERE CODE=#{role.code,jdbcType=VARCHAR} AND IS_DELETED='N')
+  		</if>
+  		<if test="relationId!=null and relationId != ''">
+  			AND AUR.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+  		</if>
+  	</where> 
+  </select>
+  <select id="selectAuthUserByRoleAndUser" parameterType="java.util.Map" resultMap="authUserResultMap">
+  	SELECT AUR.USER_ID,AUR.RELATION_ID,BUV.REAL_NAME,BUV.AVATAR
+  	FROM BASE_USER_VIEW BUV
+  	JOIN AUTH_USER_ROLE AUR
+  	ON BUV.ID = AUR.USER_ID
+  	<where>
+  		<if test="role!=null and role.id!=null">
+  			AND AUR.ROLE_ID=#{role.id,jdbcType=VARCHAR}
+  		</if>
+  		<if test="role!=null and role.code!=null">
+  			AND AUR.ROLE_ID IN(SELECT ID FROM AUTH_ROLE WHERE CODE=#{role.code,jdbcType=VARCHAR} AND IS_DELETED='N')
+  		</if>
+  		<if test="userId!=null and userId != ''">
+  			AND AUR.USER_ID=#{userId,jdbcType=VARCHAR}
+  		</if>
+  	</where> 
+  </select>
+  			  
+  <select id="selectAuthUserByParameter" parameterType="java.util.Map" resultMap="authUserResultMap">
+    	SELECT AUR.USER_ID,AUR.RELATION_ID,BUV.REAL_NAME,BUV.AVATAR
+	  	FROM BASE_USER_VIEW BUV
+	  	JOIN AUTH_USER_ROLE AUR
+	  	ON BUV.ID = AUR.USER_ID
+	  	<where>
+			<if test="roleCode != null and roleCode != ''">
+	  			and AUR.ROLE_ID IN(SELECT ID FROM AUTH_ROLE WHERE CODE=#{roleCode,jdbcType=VARCHAR} AND IS_DELETED='N')
+	  		</if>
+	  		<if test="roleId != null and roleId != ''">
+	  			and AUR.ROLE_ID=#{roleId,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="realName != null and realName != ''">
+	  			and BUV.REAL_NAME like concat(concat('%',#{realName,jdbcType=VARCHAR}),'%');
+	  		</if>
+	  		<if test="relationId!=null and relationId != ''">
+	  			AND AUR.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+	  		</if>
+  		</where>
+  </select>
+  <insert id="insertByRoleUsers" parameterType="java.util.Map">
+  	insert into AUTH_USER_ROLE(USER_ID,ROLE_ID,RELATION_ID)
+	select ID,#{role.id,jdbcType=VARCHAR},#{relationId,jdbcType=VARCHAR}
+	from BASE_USER_VIEW BUV
+	where ID IN
+	<foreach collection="userIds" item="userId" separator="," open="(" close=")">
+		#{userId,jdbcType=VARCHAR}
+	</foreach>
+	AND NOT EXISTS(SELECT 1 FROM AUTH_USER_ROLE AMR WHERE AMR.ROLE_ID=#{role.id,jdbcType=VARCHAR} and BUV.ID=AMR.USER_ID)
+  </insert>
+  <insert id="insertByUserRoles" parameterType="java.util.Map">
+  	insert into AUTH_USER_ROLE(USER_ID,ROLE_ID,RELATION_ID)
+	select #{authUser.id,jdbcType=VARCHAR},ID,#{authUser.relationId,jdbcType=VARCHAR}
+	from AUTH_ROLE AR
+	where ID IN
+	<foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+		#{roleId,jdbcType=VARCHAR}
+	</foreach>
+	AND NOT EXISTS(SELECT 1 FROM AUTH_USER_ROLE AMR WHERE AMR.USER_ID=#{authUser.id,jdbcType=VARCHAR} and AMR.ROLE_ID=AR.ID AND AMR.RELATION_ID=#{authUser.relationId,jdbcType=VARCHAR})
+  </insert>
+  <delete id="deleteByPhysics" parameterType="java.util.Map">
+  	delete from AUTH_USER_ROLE
+    <where>
+	    <if test="relationId!=null">
+	    	AND RELATION_ID=#{relationId,jdbcType=VARCHAR}
+	    </if>
+	    <if test="authUser!=null and authUser.relationId!=null">
+	    	AND RELATION_ID=#{authUser.relationId,jdbcType=VARCHAR}
+	    </if>
+	    <if test="role!=null">
+	    	AND ROLE_ID=#{role.id,jdbcType=VARCHAR}
+	    </if>
+	     <if test="authUser!=null and authUser.id!=null">
+	    	AND USER_ID=#{authUser.id,jdbcType=VARCHAR}
+	    </if>
+	    <if test="userId!=null and userId!=null">
+	    	AND USER_ID=#{userId,jdbcType=VARCHAR}
+	    </if>
+	    <if test="userIds!=null and userIds.size()>0">
+	    	AND USER_ID IN
+	    	<foreach collection="userIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+	    <if test="roleIds!=null and roleIds.size()>0">
+	    	AND ROLE_ID IN
+	    	<foreach collection="roleIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+    </where>
+  </delete>
+</mapper>

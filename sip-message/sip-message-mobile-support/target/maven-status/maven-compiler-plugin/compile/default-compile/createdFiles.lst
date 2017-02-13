@@ -1,0 +1,4 @@
+com\haoyu\sip\message\mobile\entity\MMessage.class
+com\haoyu\sip\message\mobile\service\impl\MMessageServiceImpl.class
+com\haoyu\sip\message\mobile\service\IMMessageService.class
+com\haoyu\sip\message\mobile\controller\MMessageController.class

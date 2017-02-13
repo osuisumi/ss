@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.comment.dao.impl.mybatis.CommentMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.comment.entity.Comment">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR" />
+		<result column="RELATION_TYPE" property="relation.type" jdbcType="VARCHAR" />
+		<result column="CHILD_NUM" property="childNum" jdbcType="DECIMAL" />
+		<result column="MAIN_ID" property="mainId" jdbcType="VARCHAR" />
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="REAL_NAME" property="creator.realName" jdbcType="VARCHAR" />
+		<result column="AVATAR" property="creator.avatar" jdbcType="VARCHAR" />
+		<result column="CONTENT" property="content" jdbcType="VARCHAR" />
+		<result column="EVALUATE_SCORE" property="evaluateScore" jdbcType="DECIMAL" />
+	</resultMap>
+	<resultMap type="com.haoyu.sip.comment.entity.Comment" id="CommentResultMap">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="CHILD_NUM" property="childNum" jdbcType="DECIMAL" />
+		<result column="MAIN_ID" property="mainId" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="CONTENT" property="content" jdbcType="VARCHAR" />
+		<result column="EVALUATE_SCORE" property="evaluateScore" jdbcType="DECIMAL" />
+		<result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+		
+		<result column="PARENT_ID" property="parentComment.id" jdbcType="VARCHAR" />
+		<result column="PARENT_REAL_NAME" property="parentComment.creator.realName" jdbcType="VARCHAR" />
+		<result column="PARENT_AVATAR" property="parentComment.creator.avatar" jdbcType="VARCHAR" />
+		<result column="PARENT_CREATOR" property="parentComment.creator.id" jdbcType="VARCHAR" />
+		
+		<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+			<id column="CREATOR" property="id" jdbcType="VARCHAR" />
+			<result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+			<result column="AVATAR" property="avatar" jdbcType="VARCHAR" />
+		</association>
+		<association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+			<id column="RELATION_ID" property="id" jdbcType="VARCHAR" />
+			<result column="RELATION_TYPE" property="type" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+	<resultMap type="com.haoyu.sip.comment.entity.CommentStat" id="CommentStatResultMap">
+		<id property="relationId" column="RELATION_ID" jdbcType="VARCHAR" />
+		<result property="commentNum" column="COMMENT_NUM" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap type="map" id="commentCountMap">
+		<result column="ID" property="id" jdbcType="VARCHAR"  />
+		<result column="COUNT" property="count" jdbcType="INTEGER"  />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		ID, RELATION_ID, CHILD_NUM, MAIN_ID, CREATOR, CREATE_TIME, CONTENT, RELATION_TYPE, EVALUATE_SCORE
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from COMMENTS
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByComment" parameterType="com.haoyu.sip.comment.entity.Comment" resultMap="CommentResultMap">
+		select C.ID, C.RELATION_ID,C.RELATION_TYPE, C.CHILD_NUM, C.CREATOR, C.CREATE_TIME, C.CONTENT, C.EVALUATE_SCORE,C.MAIN_ID,
+		BUV.REAL_NAME, BUV.AVATAR,C.PARENT_ID
+		from COMMENTS C
+		join BASE_USER_VIEW BUV
+		on BUV.ID = C.CREATOR
+		where C.IS_DELETED = 'N'
+		<if test="relation != null and relation.type != null">
+			and C.RELATION_TYPE = #{relation.type,jdbcType=VARCHAR}
+		</if>
+		<if test="relation != null and relation.id != null">
+			and C.RELATION_ID = #{relation.id,jdbcType=VARCHAR}
+		</if>
+		<if test="mainId != null and mainId != ''">
+			and C.MAIN_ID = #{mainId,jdbcType=VARCHAR}
+		</if>
+		<if test="creator!=null and creator.id!=null">
+			AND BUV.CREATOR=#{creator.id,jdbcType=VARCHAR}
+		</if>
+		order by C.CREATE_TIME
+	</select>
+	<select id="selectCommentStatByRelations" parameterType="java.util.List" resultMap="CommentStatResultMap">
+		select RELATION_ID, COUNT(C.ID) COMMENT_NUM
+		from COMMENTS C
+		where C.IS_DELETED='N'
+		AND RELATION_ID IN
+		<foreach collection="list" item="relationId" open="(" close=")" separator=",">
+			#{relationId,jdbcType=VARCHAR}
+		</foreach>
+		GROUP BY RELATION_ID
+	</select>
+	<select id="selectCommentStatByRelation" parameterType="com.haoyu.sip.core.entity.Relation" resultMap="CommentStatResultMap">
+		select RELATION_ID, COUNT(C.ID) COMMENT_NUM
+		from COMMENTS C
+		where C.IS_DELETED='N'
+		<if test="id!=null and id!=''">
+			and C.RELATION_ID=#{id,jdbcType=VARCHAR}
+		</if>
+		<if test="type!=null and type!=''">
+			AND C.RELATION_TYPE=#{type,jdbcType=VARCHAR}
+		</if>
+		GROUP BY RELATION_ID
+	</select>
+	<select id="select" parameterType="map" resultMap="CommentResultMap">
+		select C.ID, C.RELATION_ID, C.CHILD_NUM, C.CREATOR, C.CREATE_TIME, C.CONTENT,C.RELATION_TYPE, C.EVALUATE_SCORE,C.MAIN_ID,C.PARENT_ID,
+		(select REAL_NAME from BASE_USER_VIEW where ID = C.CREATOR) REAL_NAME, 
+		(select AVATAR from BASE_USER_VIEW where ID = C.CREATOR) AVATAR,
+		(select REAL_NAME from BASE_USER_VIEW where ID = PC.CREATOR) PARENT_REAL_NAME,
+		(select AVATAR from BASE_USER_VIEW where ID = PC.CREATOR) PARENT_AVATAR,
+		PC.CREATOR PARENT_CREATOR
+		from COMMENTS C
+		left join COMMENTS PC on PC.ID = C.PARENT_ID and PC.IS_DELETED = 'N'
+		where C.IS_DELETED = 'N'
+		<if test="relationId != null and relationId != ''">
+			and C.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="relationIds != null">
+			and C.RELATION_ID in
+			<foreach collection="relationIds" open="(" close=")" item="relationId" separator=",">
+				#{relationId,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		<if test="targetId != null and targetId != ''">
+			and C.TARGET_ID like concat('%',concat(#{targetId,jdbcType=VARCHAR},'%')) 
+		</if>
+		<if test="relationType != null and relationType != ''">
+			and C.RELATION_TYPE = #{relationType}
+		</if>
+		<choose>
+			<when test="getChild != null and getChild == true">
+			
+			</when>
+			<otherwise>
+				<choose>
+					<when test="mainId != null and mainId != ''">
+						and C.MAIN_ID = #{mainId,jdbcType=VARCHAR}
+					</when>
+					<otherwise>
+						and (C.MAIN_ID is null or C.MAIN_ID = '' or C.MAIN_ID = 'null')
+					</otherwise>
+				</choose>
+			</otherwise>
+		</choose>
+		<if test="creator != null and creator != ''">
+			and C.CREATOR = #{creator}
+		</if>
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from COMMENTS
+		where ID = #{id,jdbcType=VARCHAR}
+	</delete>
+	<insert id="insert" parameterType="com.haoyu.sip.comment.entity.Comment">
+		insert into COMMENTS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="relation!=null and relation.id!=null">
+				RELATION_ID,
+			</if>
+			<if test="relation != null and relation.type!=null">
+				RELATION_TYPE,
+			</if>
+			<if test="childNum != null">
+				CHILD_NUM,
+			</if>
+			MAIN_ID,
+			<if test="evaluateScore != null">
+				EVALUATE_SCORE,
+			</if>
+			<if test="targetId != null">
+				TARGET_ID,
+			</if>
+			<if test="creator !=null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null and createTime > 0">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null and updateTime > 0">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="content != null">
+				CONTENT,
+			</if>
+			<if test="parentId != null">
+				PARENT_ID,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation!=null and relation.id!=null">
+				#{relation.id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation != null and relation.type!=null">
+				#{relation.type,jdbcType=VARCHAR},
+			</if>
+			<if test="childNum != null">
+				#{childNum,jdbcType=DECIMAL},
+			</if>
+			<choose>
+				<when test="mainId != null and mainId != ''">
+					#{mainId,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'null',
+				</otherwise>
+			</choose>
+			<if test="evaluateScore != null">
+				#{evaluateScore, jdbcType=DECIMAL},
+			</if>
+			<if test="targetId != null">
+				#{targetId,jdbcType=VARCHAR},
+			</if>
+			<if test="creator !=null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null and createTime > 0">
+				#{createTime,jdbcType=INTEGER},
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null and updateTime > 0">
+				#{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="content != null">
+				#{content,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				#{parentId,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.comment.entity.Comment">
+		update COMMENTS
+		<set>
+			<if test="childNum != null and childNum > 0">
+				CHILD_NUM = (select CHILD_NUM from (select count(ID) CHILD_NUM from COMMENTS where IS_DELETED = 'N' and MAIN_ID = #{id,jdbcType=VARCHAR}) TMP),
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null and updateTime > 0">
+				UPDATE_TIME = #{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				VERSION = #{version,jdbcType=DECIMAL},
+			</if>
+			<if test="content != null">
+				CONTENT = #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluateScore != null">
+				EVALUATE_SCORE = #{evaluateScore,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.comment.entity.Comment">
+		update COMMENTS
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=INTEGER}
+		<if test="updatedby.id != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id, jdbcType=VARCHAR}
+		</if>
+		where ID = #{id, jdbcType=VARCHAR} or MAIN_ID = #{id, jdbcType=VARCHAR}
+	</update>
+	<select id="selectCount" parameterType="map" resultType="int">
+		select count(ID)
+		from COMMENTS
+		where IS_DELETED = 'N'
+		<if test="mainId != null and mainId != ''">
+			<choose>
+				<when test="mainId == 'null'">
+					and (MAIN_ID is null or MAIN_ID = '' or MAIN_ID = 'null')
+				</when>
+				<otherwise>
+					and MAIN_ID = #{mainId, jdbcType=VARCHAR}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="creator != null and creator != ''">
+			and CREATOR = #{creator, jdbcType=VARCHAR}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			and RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="relationType != null and relationType != ''">
+			and RELATION_TYPE = #{relationType,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<select id="selectByParameter" parameterType="map" resultMap="BaseResultMap">
+	    select
+    		C.ID, 
+    		C.RELATION_ID, 
+    		C.CHILD_NUM, 
+    		C.MAIN_ID, 
+    		C.CREATOR, 
+    		C.CREATE_TIME, 
+    		C.CONTENT, 
+    		C.RELATION_TYPE, 
+    		C.EVALUATE_SCORE,
+    		BUV.REAL_NAME, 
+    		BUV.AVATAR
+	    from
+	    	COMMENTS C
+	    inner join BASE_USER_VIEW BUV on BUV.ID = C.CREATOR
+	    where
+	    	C.IS_DELETED = 'N' 
+	    <choose>
+	        <when test="mainId != null and mainId != ''">
+				and C.MAIN_ID = #{mainId,jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				and (C.MAIN_ID is null or C.MAIN_ID = '' or C.MAIN_ID = 'null')
+			</otherwise>
+	    </choose>    
+	    <if test="relationId != null and relationId != '' ">
+			and C.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="relationType != null and relationType != ''">
+			and C.RELATION_TYPE=#{relationType,jdbcType=VARCHAR}
+		</if>
+		<if test="parentId != null and parentId != ''">
+		    and C.PARENT_ID=#{parentId,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<select id="getChildNum" resultMap="commentCountMap" >
+		select
+			C.MAIN_ID ID,
+			COUNT(1) COUNT
+		from
+			COMMENTS C
+		where
+			C.IS_DELETED = 'N'
+			<if test="commentIds != null and commentIds.size > 0">
+			    and C.MAIN_ID in
+			    <foreach item="id" open="(" close=")" separator="," collection="commentIds">
+					#{id}
+				</foreach>
+			</if>
+		group by
+			C.MAIN_ID
+	</select>
+</mapper>

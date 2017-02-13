@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.user.dao.impl.mybatis.DepartmentMapper" >
+  	<resultMap id="DepartmentResultMap" type="com.haoyu.sip.user.entity.Department" >
+	    <id column="ID" property="id" jdbcType="VARCHAR" />
+	    <result column="DEPTNAME" property="deptName" jdbcType="VARCHAR" />
+	    <result column="DEPTCODE" property="deptCode" jdbcType="VARCHAR" />
+	    <result column="DEPTTYPE" property="deptType" jdbcType="VARCHAR" />
+	 	<result column="IMAGEURL" property="imageUrl" jdbcType="VARCHAR" />
+	    <result column="STAGE" property="stage" jdbcType="VARCHAR" />
+	    <result column="WEBSITE" property="website" jdbcType="VARCHAR" />
+	    <result column="CREATE_TIME" property="createTime" jdbcType="DECIMAL" />
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="updateTime" jdbcType="DECIMAL" />
+		<result column="UPDATEDBY" property="updatedby.id" jdbcType="VARCHAR" />
+		<result column="PARENT_ID" property="parentDepartment.id" jdbcType="VARCHAR" />
+  	</resultMap>
+	<select id="selectByDepartment" resultMap="DepartmentResultMap" parameterType="com.haoyu.sip.user.entity.Department" >
+		select 
+			TD.ID ID,
+			TD.DEPT_NAME DEPTNAME,
+			TD.DEPT_CODE DEPTCODE,
+			TD.DEPT_TYPE DEPTTYPE,
+			TD.CREATE_TIME CREATE_TIME
+		from DEPARTMENT TD
+		where TD.IS_DELETED = 'N'  
+		<if test="deptName != null and deptName != ''">
+		and TD.DEPT_NAME like '%${deptName}%'  
+		</if>
+		<if test="deptType != null and deptType != ''">
+		and TD.DEPT_TYPE = #{deptType,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<select id="select" resultMap="DepartmentResultMap" parameterType="map" >
+		select 
+			TD.ID ID,
+			TD.DEPT_NAME DEPTNAME,
+			TD.DEPT_CODE DEPTCODE,
+			TD.DEPT_TYPE DEPTTYPE,
+			TD.CREATE_TIME CREATE_TIME
+		from DEPARTMENT TD
+		where TD.IS_DELETED = 'N'  
+		<if test="deptNameEquals != null and deptNameEquals != ''">
+			and TD.DEPT_NAME = #{deptNameEquals}
+		</if>
+		<if test="deptName != null and deptName != ''">
+			and TD.DEPT_NAME like '%${deptName}%'  
+		</if>
+		<if test="deptType != null and deptType != ''">
+			and TD.DEPT_TYPE = #{deptType,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.user.entity.Department">
+		insert into DEPARTMENT 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="deptName != null" >
+				DEPT_NAME,
+			</if>
+			<if test="deptCode != null">
+				DEPT_CODE,
+			</if>
+			<if test="deptType != null">
+				DEPT_TYPE,
+			</if>
+			<if test="imageUrl != null">
+				IMAGE_URL,
+			</if>
+			<if test="stage != null">
+				STAGE,
+			</if>
+			<if test="website != null">
+				WEBSITE,
+			</if>
+			<if test="creator != null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="deptName != null">
+				#{deptName,jdbcType=VARCHAR},
+			</if>
+			<if test="deptCode != null">
+				#{deptCode,jdbcType=VARCHAR},
+			</if>
+			<if test="deptType != null">
+				#{deptType,jdbcType=VARCHAR},
+			</if>
+			<if test="imageUrl != null">
+				#{imageUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="stage != null">
+	    		#{stage,jdbcType=VARCHAR},
+	    	</if>
+	    	<if test="website != null">
+	    		#{website,jdbcType=VARCHAR},
+	    	</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL}
+			</if>
+		</trim>
+	</insert>
+	<select id="selectByPrimaryKey" resultMap="DepartmentResultMap" parameterType="java.lang.String" >
+		select
+		  TD.ID ID,
+		  TD.DEPT_NAME DEPTNAME,
+		  TD.DEPT_CODE DEPTCODE,
+		  TD.DEPT_TYPE DEPTTYPE,
+		  TD.IMAGE_URL IMAGEURL,
+		  TD.STAGE     STAGE,
+		  TD.WEBSITE   WEBSITE,
+		  TD.PARENT_ID PARENT_ID
+		from
+			DEPARTMENT TD
+		where
+			TD.IS_DELETED = 'N' and TD.ID = #{id,jdbcType=VARCHAR}
+  	</select>
+  	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.user.entity.Department">
+	  	update DEPARTMENT
+	  	<set>
+	      <if test="deptName != null and deptName!=''" >
+	        DEPT_NAME = #{deptName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="deptCode != null and deptCode!=''" >
+	        DEPT_CODE = #{deptCode,jdbcType=VARCHAR},
+	      </if>
+	      <if test="deptType != null and deptType!=''" >
+	        DEPT_TYPE = #{deptType,jdbcType=VARCHAR},
+	      </if>
+	      <if test="imageUrl != null and imageUrl!=''" >
+	        IMAGE_URL = #{imageUrl,jdbcType=VARCHAR},
+	      </if>
+	      <if test="stage != null and stage!=''" >
+	        STAGE = #{stage,jdbcType=VARCHAR},
+	      </if>
+	      <if test="website != null and website!=''" >
+	        WEBSITE = #{website,jdbcType=VARCHAR},
+	      </if>
+	      <if test="updatedby != null" >
+	        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+	      </if>
+	      <if test="updateTime != null" >
+	        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+	      </if>
+	      <if test="parentDepartment != null and parentDepartment.id != ''" >
+	        PARENT_ID = #{parentDepartment.id,jdbcType=VARCHAR},
+	      </if>	      
+	      VERSION = VERSION+1
+	    </set>
+	    where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="batchDeleteByIds" parameterType="java.util.List">
+	  	update DEPARTMENT 
+	  	set IS_DELETED = 'Y'
+	  	where ID in
+	  	<foreach collection="list" open="(" close=")" item="id" separator=",">
+	  		#{id,jdbcType=VARCHAR}  	
+	  	</foreach>
+    </update>
+    <select id="getDepartmentCountForValidDeptNameIsExist" resultType="int" parameterType="com.haoyu.sip.user.entity.Department">
+    	select 
+    		COUNT(ID) 
+    	from DEPARTMENT
+    	<trim prefix="where" prefixOverrides="and">
+	    	<if test="deptName != null and deptName != ''" >
+	    	  and DEPT_NAME = #{deptName}
+	    	</if>
+	    	<if test="id != null and id != ''" >
+	    	  and ID != #{id}
+	    	</if>
+	    	and IS_DELETED = 'N'
+    	</trim>
+    </select>
+    <select id="getDepartmentCodeForValidDeptCodeIsExist" resultType="int" parameterType="com.haoyu.sip.user.entity.Department">
+    	select COUNT(DEPT_CODE)  
+    	from DEPARTMENT 
+    	<trim prefix="where" prefixOverrides="and">
+	    	<if test=" id != null and id != '' " >
+	    	  and ID != #{id} 
+	    	</if>    	
+	    	<if test=" deptCode != null and deptCode != '' " >
+	    	  and DEPT_CODE = #{deptCode} 
+	    	</if>
+			and IS_DELETED = 'N'
+    	</trim>
+    </select>
+</mapper>

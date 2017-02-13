@@ -1,0 +1,4 @@
+com\haoyu\search\utils\IndexUtils.class
+com\haoyu\search\utils\SearchUtils.class
+com\haoyu\search\entity\QueryField.class
+com\haoyu\search\entity\SearchResultBean.class

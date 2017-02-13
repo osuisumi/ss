@@ -1,0 +1,4 @@
+com\haoyu\sip\mobile\file\service\IMFileInfoService.class
+com\haoyu\sip\mobile\file\entity\MFileInfo.class
+com\haoyu\sip\mobile\file\controller\MFileController.class
+com\haoyu\sip\mobile\file\service\impl\MFileInfoServiceImpl.class

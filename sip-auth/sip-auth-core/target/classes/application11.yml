@@ -1,0 +1,13 @@
+shiro:
+	casRealm:
+		casServerUrlPrefix:
+		casService:
+	logoutFilter:
+		redirectUrl:
+	shiroFilter:
+		loginUrl:
+		successUrl:
+		unauthorizedUrl:
+	casFilter:
+		failureUrl:
+		

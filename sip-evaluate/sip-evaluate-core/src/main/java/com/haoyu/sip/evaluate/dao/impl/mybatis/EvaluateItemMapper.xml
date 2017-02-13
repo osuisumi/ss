@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.evaluate.dao.impl.mybatis.EvaluateItemMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.evaluate.entity.EvaluateItem">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="CONTENT" jdbcType="VARCHAR" property="content" />
+		<result column="EVALUATE_ID" jdbcType="VARCHAR" property="evaluate.id" />
+		<result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />
+		<result column="CREATOR" jdbcType="VARCHAR" property="creator.id" />
+		<result column="CREATE_TIME" jdbcType="DECIMAL" property="createTime" />
+		<result column="UPDATEDBY" jdbcType="VARCHAR" property="updatedby.id" />
+		<result column="UPDATE_TIME" jdbcType="DECIMAL" property="updateTime" />
+		<result column="VERSION" jdbcType="DECIMAL" property="version" />
+		<result column="IS_DELETED" jdbcType="CHAR" property="isDeleted" />
+	</resultMap>
+	<sql id="BaseSelectSql">
+		select EI.ID EVALUATE_ITEM_ID, EI.CONTENT, EI.SORT_NO, EI.CREATOR, EI.CREATE_TIME,
+		from EVALUATE_ITEM EI
+	</sql>
+	<sql id="BaseWhereSql">
+		<choose>
+			<when test="isDeleted != null and isDeleted != ''">
+				where EI.IS_DELETED = #{isDeleted}
+			</when>
+			<otherwise>
+				where EI.IS_DELETED = 'N'
+			</otherwise>
+		</choose>
+		<if test="content != null and content != ''">
+			and EI.CONTENT like '%${content}%'
+		</if>
+	</sql>
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		<include refid="BaseSelectSql" />
+		<include refid="BaseWhereSql" />
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		<include refid="BaseSelectSql" />
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.evaluate.entity.EvaluateItem">
+		insert into EVALUATE_ITEM
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="content != null">
+				CONTENT,
+			</if>
+			<if test="evaluate != null and evaluate.id != null">
+				EVALUATE_ID,
+			</if>
+			<if test="sortNo != null">
+				SORT_NO,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null">
+				#{content,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluate != null and evaluate.id != null">
+				#{evaluate.id,jdbcType=VARCHAR},
+			</if>
+			<if test="sortNo != null">
+				#{sortNo,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.evaluate.entity.EvaluateItem">
+		update EVALUATE_ITEM
+		<set>
+			<if test="content != null">
+				CONTENT = #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluate != null and evaluate.id != null">
+				EVALUATE_ID = #{evaluate.id,jdbcType=VARCHAR},
+			</if>
+			<if test="sortNo != null">
+				SORT_NO = #{sortNo,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				CREATOR = #{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				VERSION = #{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="map">
+		update EVALUATE_ITEM
+		set IS_DELETED = 'Y', UPDATE_TIME = #{entity.updateTime, jdbcType=TIMESTAMP}
+		<if test="entity.updatedby != null and entity.updatedby.id != null and entity.updatedby.id != ''">
+			,UPDATEDBY = #{entity.updatedby.id, jdbcType=VARCHAR}
+		</if>
+		where ID in
+		<foreach collection="ids" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

@@ -1,0 +1,10 @@
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\dao\impl\mybatis\TagRelationDao.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\entity\Tag.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\entity\TagRelation.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\dao\impl\mybatis\TagDao.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\service\ITagService.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\dao\ITagDao.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\dao\ITagRelationDao.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\service\impl\TagServiceImpl.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\service\impl\TagRelationServiceImpl.java
+E:\workshopspace\base\sip\sip-tag\sip-tag-core\src\main\java\com\haoyu\sip\tag\service\ITagRelationService.java

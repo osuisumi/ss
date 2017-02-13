@@ -1,0 +1,4 @@
+com\haoyu\sip\user\mobile\service\IMUserService.class
+com\haoyu\sip\user\mobile\entity\MUser.class
+com\haoyu\sip\user\mobile\service\impl\MUserServiceImpl.class
+com\haoyu\sip\user\mobile\controller\MUserController.class

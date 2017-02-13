@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.evaluate.dao.impl.mybatis.EvaluateItemSubmissionMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.evaluate.entity.EvaluateItemSubmission">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="EVALUATE_SUBMISSION_ID" jdbcType="VARCHAR" property="evaluateSubmission.id" />
+		<result column="COMMENTS" jdbcType="VARCHAR" property="comment" />
+		<result column="SCORE" jdbcType="DECIMAL" property="score" />
+		<result column="EVALUATE_ITEM_ID" jdbcType="VARCHAR" property="evaluateItem.id" />
+		<result column="CREATOR" jdbcType="VARCHAR" property="creator.id" />
+		<result column="CREATE_TIME" jdbcType="DECIMAL" property="createTime" />
+	</resultMap>
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		select EIS.ID EVALUATE_ITEM_SUBMISSION_ID, EIS.EVALUATE_ITEM_ID, EIS.SCORE, EIS.COMMENTS
+		from EVALUATE_ITEM_SUBMISSION EIS
+		where EIS.IS_DELETED = 'N'
+		<if test="evaluateRelationId != null and evaluateRelationId != ''">
+			and exists (select 1 from EVALUATE_SUBMISSION where ID = EIS.EVALUATE_SUBMISSION_ID and IS_DELETED = 'N' and EVALUATE_RELATION_ID = #{evaluateRelationId})
+		</if>
+		<if test="evaluateItemId != null and evaluateItemId != ''">
+			and EIS.EVALUATE_ITEM_ID = #{evaluateItemId,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.evaluate.entity.EvaluateItemSubmission">
+		insert into EVALUATE_ITEM_SUBMISSION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="evaluateSubmission != null">
+				EVALUATE_SUBMISSION_ID,
+			</if>
+			<if test="evaluateItem != null">
+				EVALUATE_ITEM_ID,
+			</if>
+			<if test="score != null">
+				SCORE,
+			</if>
+			<if test="comment != null">
+				COMMENTS,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluateSubmission != null">
+				#{evaluateSubmission.id,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluateItem != null">
+				#{evaluateItem.id,jdbcType=VARCHAR},
+			</if>
+			<if test="score != null">
+				#{score,jdbcType=DECIMAL},
+			</if>
+			<if test="comment != null">
+				#{comment,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.evaluate.entity.EvaluateItemSubmission">
+		update EVALUATE_ITEM_SUBMISSION
+		<set>
+			<if test="score != null">
+				SCORE = #{score,jdbcType=DECIMAL},
+			</if>
+			<if test="comment != null">
+				COMMENTS = #{comment,jdbcType=VARCHAR},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				VERSION = #{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="map">
+		update EVALUATE_ITEM_SUBMISSION
+		set IS_DELETED = 'Y', UPDATE_TIME = #{entity.updateTime, jdbcType=TIMESTAMP}
+		<if test="entity.updatedby != null and entity.updatedby.id != null and entity.updatedby.id != ''">
+			,UPDATEDBY = #{entity.updatedby.id, jdbcType=VARCHAR}
+		</if>
+		where ID in
+		<foreach collection="ids" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

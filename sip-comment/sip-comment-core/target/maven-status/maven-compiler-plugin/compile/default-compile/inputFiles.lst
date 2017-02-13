@@ -1,0 +1,17 @@
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\base\entity\BaseEntity.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\dao\impl\mybatis\CommentDao.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\event\DeleteCommentEvent.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\listener\ClearCache_UpdateCommentListener.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\service\ICommentService.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\template\CommentsDirective.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\listener\ClearCache_CreateCommentListener.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\event\UpdateCommentEvent.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\listener\ClearCache_DeleteCommentListener.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\template\CommentsDataDirective.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\utils\RelationType.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\entity\Comment.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\dao\ICommentDao.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\entity\CommentStat.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\event\CreateCommentEvent.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\sip\comment\service\impl\CommentServiceImpl.java
+E:\workshopspace\base\sip\sip-comment\sip-comment-core\src\main\java\com\haoyu\base\utils\BaseServiceUtils.java

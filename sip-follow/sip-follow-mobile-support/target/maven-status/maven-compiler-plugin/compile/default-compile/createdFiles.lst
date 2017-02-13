@@ -1,0 +1,4 @@
+com\haoyu\sip\follow\mobile\service\impl\MFollowService.class
+com\haoyu\sip\follow\mobile\service\IMFollowService.class
+com\haoyu\sip\follow\mobile\entity\MFollow.class
+com\haoyu\sip\follow\mobile\controller\MFollowController.class

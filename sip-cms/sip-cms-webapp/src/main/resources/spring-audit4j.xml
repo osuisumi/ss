@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context.xsd 
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+	<bean id="layout" class="org.audit4j.core.layout.SimpleLayout"></bean>
+<!-- 	<bean id="metaData" class="com.myproject.util.AuditMetaData"></bean> -->
+
+	<bean id="consoleAuditHandler" class="org.audit4j.core.handler.ConsoleAuditHandler"></bean>
+	<bean id="databaseAuditHandler" class="org.audit4j.handler.db.DatabaseAuditHandler">
+		<property name="embedded" value="false"/>
+		<property name="db_connection_type" value="pooled"/>
+		<property name="db_driver" value="com.mysql.jdbc.Driver"/>
+		<property name="db_url" value="jdbc:mysql://localhost/audit4j"/>
+		<property name="db_user" value="root"/>
+		<property name="db_password" value="root"/>
+	</bean>
+	<bean id="auditconfig" class="org.audit4j.integration.spring.SpringAudit4jConfig">
+		<property name="layout" ref="layout"></property>
+<!-- 		<property name="metaData" ref="metaData"></property> -->
+		<property name="handlers">
+			<list>
+				<ref bean="consoleAuditHandler" />
+				<ref bean="databaseAuditHandler" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- <bean id="auditAspect" class="org.audit4j.integration.spring.AuditAspect" />
+
+	<aop:aspectj-autoproxy>
+		<aop:include name="auditAspect" />
+	</aop:aspectj-autoproxy>
+
+	<bean id="auditAdvice" class="org.audit4j.integration.spring.AuditAdvice" />
+
+	<bean id="serviceClassImpl" class="com.myproject.ServiceImpl">
+		properties here
+	</bean>
+
+	<bean id="serviceImplProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="serviceClassImpl" />
+		<property name="interceptorNames">
+			<list>
+				<value>auditAdvice</value>
+			</list>
+		</property>
+	</bean> -->
+</beans>

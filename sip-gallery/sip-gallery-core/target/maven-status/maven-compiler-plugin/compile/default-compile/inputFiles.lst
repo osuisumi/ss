@@ -1,0 +1,16 @@
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\entity\PhotoGalleryPhoto.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\service\IPhotoService.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\IPhotoGalleryPhotoDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\service\impl\PhotoGalleryServiceImpl.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\service\IPhotoGalleryService.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\template\PhotoGalleryListDirective.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\impl\mybatis\PhotoGalleryPhotoDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\impl\mybatis\PhotoGalleryDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\service\impl\PhotoServiceImpl.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\event\AddPhotosToGalleryEvent.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\IPhotoDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\IPhotoGalleryDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\template\PhotoListDirective.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\dao\impl\mybatis\PhotoDao.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\entity\Photo.java
+E:\workshopspace\base\sip\sip-gallery\sip-gallery-core\src\main\java\com\haoyu\sip\gallery\entity\PhotoGallery.java

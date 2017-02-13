@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthUserMapper">
+	<resultMap type="com.haoyu.sip.auth.entity.AuthUser" id="authUserResultMap">
+		<id property="id" column="ID" jdbcType="VARCHAR" />
+		<result property="realName" column="REAL_NAME" jdbcType="VARCHAR" />
+		<result property="avatar" column="AVATAR" jdbcType="VARCHAR" />
+		<result property="username" column="USER_NAME" jdbcType="VARCHAR" />
+		<result property="password" column="PASSWORD" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="MenuResultMap" type="com.haoyu.sip.auth.entity.AuthMenu">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="ORDER_NO" property="orderNo" jdbcType="INTEGER" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="DECIMAL" />
+		<association property="permission"
+			javaType="com.haoyu.sip.auth.entity.AuthPermission">
+			<id column="PERMISSION_ID" property="id" />
+			<result column="ACTION_URI" property="actionURI" />
+		</association>
+		<association property="parent" javaType="com.haoyu.sip.auth.entity.AuthMenu">
+			<id column="PARENT_ID" property="id" />
+			<result column="PARENT_NAME" property="name" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+	<select id="selectByParameter" parameterType="java.util.Map"
+		resultMap="authUserResultMap">
+		SELECT ID,REAL_NAME,AVATAR,USER_NAME,PASSWORD
+		FROM BASE_USER_VIEW BUV
+		<where>
+			<if test="username!=null and username!=''">
+				AND BUV.USER_NAME=#{username,jdbcType=VARCHAR}
+			</if>
+			<if test="realName!=null and realName!=''">
+				<bind name="pattern" value="'%' + realName + '%'" />
+				AND BUV.REAL_NAME LIKE #{pattern,jdbcType=VARCHAR}
+			</if>
+			<if test="password!=null and password!=''">
+				AND BUV.PASSWORD=#{password,jdbcType=VARCHAR}
+			</if>
+			<if test="userId!=null and userId!=''">
+				AND BUV.ID=#{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="relationId!=null">
+				AND BUV.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+			</if>
+			<if test="userIds!=null">
+				AND ID IN
+				<foreach collection="userIds" item="userId" separator=","
+					open="(" close=")">
+					#{userId,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	<select id="selectAuthUserMenus" parameterType="java.util.Map"
+		resultMap="MenuResultMap">
+	   select 
+	     M.ID, M.NAME,M.ORDER_NO,P.ID AS PERMISSION_ID,P.ACTION_URI,MP.ID AS PARENT_ID,MP.NAME PARENT_NAME, M.CREATE_TIME
+	    from AUTH_MENU M
+	    left join AUTH_PERMISSION P
+	    on M.PERMISSION_ID = P.ID
+	    and P.IS_DELETED='N'
+	    left join AUTH_MENU MP
+	    on MP.ID = M.PARENT_ID
+	    and MP.IS_DELETED='N'
+	    where M.IS_DELETED='N'
+	    and EXISTS(select 1 from AUTH_ROLE_MENU MR WHERE MR.MENU_ID=M.ID 
+	    AND MR.ROLE_ID IN (
+	    SELECT AUR.ROLE_ID FROM AUTH_USER_ROLE AUR WHERE USER_ID=#{userId,jdbcType=VARCHAR}
+	    <if test="relationId!=null and relationId!=''">
+	    	AND RELATION_ID=#{relationId,jdbcType=VARCHAR}
+	    </if>
+	    ))
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.auth.entity.AuthRole">
+  	insert into AUTH_USER(ID,USER_NAME,PASSWORD,REAL_NAME,AVATAR,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{realName,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR}
+  	,#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.auth.entity.AuthRole">
+  	update AUTH_USER
+  	<set >
+      <if test="username != null and username!=''" >
+        USER_NAME = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null and password!=''" >
+        PASSWORD = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null and realName!=''" >
+        REAL_NAME = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="avatar != null and avatar!=''" >
+        AVATAR = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.auth.entity.AuthUser">
+  	  update AUTH_USER
+  	  set IS_DELETED='Y'
+      <if test="updatedby != null" >
+        ,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+      </if>
+      <if test="updateTime != null" >
+        ,UPDATE_TIME = #{updateTime,jdbcType=BIGINT}
+      </if>
+      where ID=#{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

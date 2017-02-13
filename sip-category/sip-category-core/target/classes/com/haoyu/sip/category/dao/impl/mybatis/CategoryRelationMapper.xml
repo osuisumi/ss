@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.category.dao.impl.mybatis.CategoryRelationMapper" >
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.category.entity.CategoryRelation" >
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="CATEGORY_ID" property="category.id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR" />
+		<result column="RELATION_TYPE" property="relation.type" jdbcType="VARCHAR" />
+	</resultMap>
+ 
+	<insert id="insert" parameterType="com.haoyu.sip.category.entity.CategoryRelation">
+		insert into CATEGORY_RELATION 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="category != null and category.id != null and category.id != ''">
+				CATEGORY_ID,
+			</if>
+			<if test="relation != null and relation.id != null and relation.id != ''">
+				RELATION_ID,
+			</if>
+			<if test="relation != null and relation.type != null and relation.type != ''">
+				RELATION_TYPE,
+			</if>
+			<if test="creator != null and creator.id != null and creator.id != ''">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="category != null and category.id != null and category.id != ''">
+				#{category.id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation != null and relation.id != null and relation.id != ''">
+				#{relation.id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation != null and relation.type != null and relation.type != ''">
+				#{relation.type ,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null and creator.id != ''">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.category.entity.CategoryRelation">
+		update CATEGORY_RELATION
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME= #{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="creator != null and creator.id != null and creator.id != ''">
+				CREATOR = #{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME= #{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.category.entity.CategoryRelation">
+		update CATEGORY_RELATION
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=DECIMAL}
+		<set>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+			</if>
+		</set>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

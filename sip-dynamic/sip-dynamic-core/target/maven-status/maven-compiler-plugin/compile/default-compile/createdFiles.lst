@@ -1,0 +1,8 @@
+com\haoyu\sip\dynamic\dao\impl\mybatis\DynamicDao.class
+com\haoyu\base\entity\BaseEntity.class
+com\haoyu\sip\dynamic\service\impl\DynamicService.class
+com\haoyu\base\utils\BaseServiceUtils.class
+com\haoyu\sip\dynamic\entity\Dynamic.class
+com\haoyu\sip\dynamic\event\CreateDynamicEvent.class
+com\haoyu\sip\dynamic\service\IDynamicService.class
+com\haoyu\sip\dynamic\dao\IDynamicDao.class

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.tag.dao.impl.mybatis.TagMapper" >
+  <resultMap id="BaseResultMap" type="com.haoyu.sip.tag.entity.Tag" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="SUMMARY" property="summary" jdbcType="VARCHAR" />
+    <result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, NAME, SUMMARY, CREATOR
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TAG
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPhysics" parameterType="java.lang.String" >
+    delete from TAG
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.haoyu.sip.tag.entity.Tag" >
+    insert into TAG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="summary != null" >
+        SUMMARY,
+      </if>
+      <if test="creator != null" >
+        CREATOR,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY,
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME,
+      </if>
+      <if test="isDeleted != null" >
+        IS_DELETED,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null" >
+        #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        #{creator.id,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=INTEGER},
+      </if>
+      <if test="updatedby != null" >
+        #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null" >
+        #{isDeleted,jdbcType=CHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.tag.entity.Tag" >
+    update TAG
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null" >
+        SUMMARY = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=INTEGER},
+      </if>
+        VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="deleteWithoutRelation" parameterType="com.haoyu.sip.tag.entity.Tag">
+  	update TAG L
+  	set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=INTEGER}
+  	<if test="updatedby != null and updatedby != ''">
+  		,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+  	</if>
+  	where L.IS_DELETED = 'N'
+  	and not exists (select 1 from TAG_RELATION LR where L.ID = LR.TAG_ID)
+  </update>
+  <select id="selectTagByLikeName" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	 select ID, NAME
+  	from TAG
+  	where IS_DELETED = 'N'
+    and NAME LIKE '%${name}%' 
+    order by name
+  </select>
+  <select id="selectTagByNameAndRelations" resultMap="BaseResultMap" parameterType="java.util.Map">
+   select ID, NAME, CREATOR 
+   from TAG T
+   where T.IS_DELETED='N'
+   <if test="name!=null and name!=''">
+   		AND T.NAME LIKE '%${name}%' 
+   		
+   </if>
+   <if test="relations!=null">
+   		AND EXISTS(SELECT 1 FROM TAG_RELATION TR WHERE TR.TAG_ID=T.ID
+   		AND TR.RELATION_ID IN
+   		<foreach collection="relations" item="relationId" open="(" close=")" separator=",">
+   			#{relationId,jdbcType=VARCHAR}
+   		</foreach>
+   		)
+   </if>
+   <if test="relationType != null">
+   		and exists(select 1 from TAG_RELATION TR WHERE TR.TAG_ID = T.ID and TR.TYPE = #{relationType,jdbcType=VARCHAR})
+   </if>
+   order by name
+  </select>
+</mapper>

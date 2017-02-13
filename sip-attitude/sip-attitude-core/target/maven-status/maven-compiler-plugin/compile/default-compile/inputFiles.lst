@@ -1,0 +1,8 @@
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\entity\AttitudeStat.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\entity\AttitudeUser.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\event\DeleteAttitudeUserEvent.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\dao\IAttitudeUserDao.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\service\IAttitudeService.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\service\impl\AttitudeServiceImpl.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\dao\impl\mybatis\AttitudeUserDao.java
+E:\workshopspace\base\sip\sip-attitude\sip-attitude-core\src\main\java\com\haoyu\sip\attitude\event\CreateAttitudeUserEvent.java

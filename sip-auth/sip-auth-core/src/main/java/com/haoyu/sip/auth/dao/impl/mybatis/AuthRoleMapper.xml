@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthRoleMapper" >
+  <resultMap id="RoleResultMap" type="com.haoyu.sip.auth.entity.AuthRole" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="SUMMARY" property="summary" jdbcType="VARCHAR" />
+    <result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+<!--     <collection property="permissions" ofType="com.haoyu.sip.auth.entity.Permission">
+    	<id column="PERMISSION_ID" property="id"/>
+    	<result column="PERMISSION_NAME" property="name"/>
+    	<result column="ACTION" property="action"/>
+    	<result column="ACTION_URI" property="actionURI"/>
+    </collection>
+    <collection property="menus" ofType="com.haoyu.sip.auth.entity.Menu">
+    	<id column="MENU_ID" property="id"/>
+    	<result column="MENU_NAME" property="name" jdbcType="VARCHAR" />
+    </collection> -->
+  </resultMap>
+  <sql id="Base_Column_List" >
+    R.ID, R.NAME,R.CODE,R.RELATION_ID,R.SUMMARY,R.CREATE_TIME<!-- ,P.ID PERMISSION_ID,P.NAME PERMISSION_NAME,P.ACTION ,P.ACTION_URI,
+    M.ID MENU_ID,M.NAME MENU_NAME -->
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="RoleResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from AUTH_ROLE R
+    <!-- left join AUTH_ROLE_PERMISSION ARP
+    on R.ID = ARP.ROLE_ID
+    left join AUTH_PERMISSION P
+    on ARP.PERMISSION_ID = P.ID
+    and P.IS_DELETED='N'
+    left join AUTH_ROLE_MENU AMR
+    on AMR.ROLE_ID = R.ID
+    and R.IS_DELETED='N'
+    left join AUTH_MENU M
+    on M.ID = AMR.MENU_ID
+    and M.IS_DELETED='N' -->
+    where R.IS_DELETED='N'
+    and R.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByRole" resultMap="RoleResultMap" parameterType="com.haoyu.sip.auth.entity.AuthRole" >
+    select 
+    <include refid="Base_Column_List"/>
+    from AUTH_ROLE R
+    <!-- left join AUTH_ROLE_PERMISSION ARP
+    on R.ID = ARP.ROLE_ID
+    left join AUTH_PERMISSION P
+    on ARP.PERMISSION_ID = P.ID
+    and P.IS_DELETED='N'
+    left join AUTH_ROLE_MENU AMR
+    on AMR.ROLE_ID = R.ID
+    and R.IS_DELETED='N'
+    left join AUTH_MENU M
+    on M.ID = AMR.MENU_ID
+    and M.IS_DELETED='N' -->
+    where R.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	and R.NAME LIKE CONCAT(CONCAT('%',#{name,jdbcType=VARCHAR}),'%')
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and R.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+    <if test="authUsers!=null and authUsers.size()>0">
+    	and EXISTS(select 1 from AUTH_USER_ROLE AUR WHERE AUR.ROLE_ID=R.ID 
+    	AND AUR.USER_ID IN
+    	<foreach collection="authUsers" item="authUser" separator="," open="(" close=")">
+    		#{authUser.id}
+    	</foreach>
+    	)
+    </if>
+    <if test="permissions!=null and permissions.size()>0">
+    	and EXISTS(select 1 from AUTH_ROLE_PERMISSION APR WHERE APR.ROLE_ID=R.ID 
+    	AND APR.PERMISSION_ID IN
+    	<foreach collection="permissions" item="permission" separator="," open="(" close=")">
+    		#{permission.id}
+    	</foreach>
+    	)
+    </if>
+    <if test="menus!=null and menus.size()>0">
+    	and EXISTS(select 1 from AUTH_ROLE_MENU AMR WHERE AMR.ROLE_ID=R.ID 
+    	AND AMR.MENU_ID IN
+    	<foreach collection="menus" item="menu" separator="," open="(" close=")">
+    		#{menu.id}
+    	</foreach>
+    	)
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.auth.entity.AuthRole">
+  	insert into AUTH_ROLE(ID,CODE,NAME,SUMMARY,RELATION_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{code,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{summary,jdbcType=VARCHAR},#{relationId,jdbcType=VARCHAR}
+  	,#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.auth.entity.AuthRole">
+  	update AUTH_ROLE
+  	<set >
+      <if test="code != null and code!=''" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null and summary!=''" >
+        SUMMARY = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete from AUTH_ROLE
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.auth.entity.AuthRole">
+  	  update AUTH_ROLE
+  	  set IS_DELETED='Y'
+      <if test="updatedby != null" >
+        ,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+      </if>
+      <if test="updateTime != null" >
+        ,UPDATE_TIME = #{updateTime,jdbcType=BIGINT}
+      </if>
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relationId,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+  
+  <delete id="batchDeleteByIds" parameterType="java.util.List">
+  	delete from AUTH_ROLE 
+  	where ID in
+  	<foreach collection="list" open="(" close=")" item="id" separator=",">
+  		#{id,jdbcType=VARCHAR}  	
+  	</foreach>
+  </delete>
+</mapper>

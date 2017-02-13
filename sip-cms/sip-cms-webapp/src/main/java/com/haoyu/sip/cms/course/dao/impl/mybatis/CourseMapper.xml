@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.cms.course.dao.impl.mybatis.CourseMapper">
+	<resultMap id="SimpleCourseResult" type="com.haoyu.sip.cms.course.entity.Course">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+		<result column="COURSE_ID" property="courseId" jdbcType="VARCHAR"/>
+		<result column="COURSE_TITLE" property="courseTitle" jdbcType="VARCHAR"/>
+		<result column="COURSE_IMAGE" property="courseImage" jdbcType="VARCHAR"/>
+		<result column="COURSE_STUDY_HOURS" property="studyHours" jdbcType="VARCHAR" />
+		<result column="TRAIN_ID" property="trainId" jdbcType="VARCHAR"/>
+		<association property="timePeriod" javaType="com.haoyu.sip.core.entity.TimePeriod">
+			<result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+			<result column="END_TIME" property="endTime" jdbcType="TIMESTAMP" />
+		</association>
+	</resultMap>
+	<resultMap id="ComplexCourseResult" type="com.haoyu.sip.cms.course.entity.Course">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+		<result column="PARTICIPATE_NUM" property="participateNum" jdbcType="DECIMAL" />
+		<result column="COURSE_ID" property="courseId" jdbcType="VARCHAR"/>
+		<result column="COURSE_TITLE" property="courseTitle" jdbcType="VARCHAR"/>
+		<result column="COURSE_IMAGE" property="courseImage" jdbcType="VARCHAR"/>
+		<result column="COURSE_STUDY_HOURS" property="studyHours" jdbcType="VARCHAR" />
+		<result column="COURSE_TYPE" property="courseType" jdbcType="VARCHAR"/>
+		<result column="TRAIN_ID" property="trainId" jdbcType="VARCHAR"/>
+		<result column="TRAIN_NAME" property="trainName" jdbcType="VARCHAR"/>
+		<result column="CONTENT" property="courseContent" jdbcType="VARCHAR"/>
+		<result column="SUMMARY" property="courseSummary" jdbcType="VARCHAR"/>
+		<association property="timePeriod" javaType="com.haoyu.sip.core.entity.TimePeriod">
+			<result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+			<result column="END_TIME" property="endTime" jdbcType="TIMESTAMP" />
+		</association>
+		<collection property="authors" ofType="com.haoyu.sip.core.entity.User">
+			<id column="USER_ID" property="id" jdbcType="VARCHAR"/>
+			<result column="REAL_NAME" property="realName" jdbcType="VARCHAR"/>
+		</collection>
+	</resultMap>
+	<select id="selectByParameter" parameterType="map" resultMap="SimpleCourseResult">
+		select CR.ID,CR.RELATION_ID,CR.START_TIME,CR.END_TIME,
+		C.ID COURSE_ID,C.TITLE COURSE_TITLE,C.IMAGE COURSE_IMAGE,C.STUDY_HOURS COURSE_STUDY_HOURS,
+		T.ID TRAIN_ID
+		from COURSE_RELATION CR
+		join COURSE C
+		on CR.COURSE_ID = C.ID
+		and C.IS_DELETED = 'N'
+		left join TRAIN T 
+		on T.ID = CR.RELATION_ID 
+		and T.IS_DELETED = 'N'		
+		where CR.IS_DELETED = 'N'
+		AND C.STATE='pass'
+		<if test="courseId != null and courseId != ''">
+			and CR.COURSE_ID = #{courseId,jdbcType=VARCHAR}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			and CR.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="subject != null and subject != ''">
+			and C.SUBJECT like #{subject,jdbcType=VARCHAR}
+		</if>
+		<if test="stage != null and stage != ''">
+			and C.STAGE = #{stage,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<select id="selectCourseByCRid" parameterType="string" resultMap="ComplexCourseResult">
+		select CR.ID,CR.RELATION_ID,CR.START_TIME,CR.END_TIME,CR.PARTICIPATE_NUM,
+		C.ID COURSE_ID,C.TYPE COURSE_TYPE,C.TITLE COURSE_TITLE,C.IMAGE COURSE_IMAGE,C.STUDY_HOURS COURSE_STUDY_HOURS,
+		T.ID TRAIN_ID,T.NAME TRAIN_NAME,C.CONTENT,C.SUMMARY,
+		CA.USER_ID,(select REAL_NAME from BASE_USER_VIEW BUV WHERE BUV.ID=CA.USER_ID) REAL_NAME
+		from COURSE_RELATION CR
+		join COURSE C
+		on CR.COURSE_ID = C.ID
+		and C.IS_DELETED = 'N'
+		left join TRAIN T on T.ID = CR.RELATION_ID and T.IS_DELETED = 'N'
+		left join COURSE_AUTHORIZE CA
+		ON CA.COURSE_ID=C.ID
+		AND CA.IS_DELETED='N'
+		AND CA.ROLE='maker' 
+		where CR.ID = #{id, jdbcType=VARCHAR}
+	</select>
+</mapper>

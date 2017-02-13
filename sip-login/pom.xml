@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.haoyu.sip</groupId>
+    <artifactId>sip</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>sip-login</artifactId>
+  <name>sip-login</name>
+  <description>sip 登录组件</description>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>sip-login-core</module>
+  	<module>sip-login-support-jdbc</module>
+  	<module>sip-login-webapp-support</module>
+  	<module>sip-login-webapp</module>
+  	<module>sip-login-client</module>
+  </modules>
+</project>

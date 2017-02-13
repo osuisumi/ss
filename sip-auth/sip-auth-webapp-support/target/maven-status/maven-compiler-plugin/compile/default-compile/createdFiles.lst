@@ -1,0 +1,5 @@
+com\haoyu\sip\auth\controller\AuthPermissionController.class
+com\haoyu\sip\auth\controller\AuthRoleController.class
+com\haoyu\sip\auth\controller\AuthUserController.class
+com\haoyu\sip\auth\controller\AuthResourceController.class
+com\haoyu\sip\auth\controller\AuthMenuController.class

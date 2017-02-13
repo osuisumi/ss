@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.resource.dao.impl.mybatis.ResourceMapper" >
+  <resultMap id="ResourceResultMap" type="com.haoyu.sip.cms.resource.entity.Resource" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="SUMMARY" property="summary" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="FRONT_COVER" property="frontCover" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+    	<id column="RELATION_ID" property="id" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.NAME,M.RELATION_ID,M.TYPE,M.SUMMARY,M.URL,M.FRONT_COVER,M.CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResourceResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_RESOURCE M
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="ResourceResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_RESOURCE M
+    where M.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	<bind name="pattern" value="'%' + name + '%'" />
+    	and M.NAME LIKE #{pattern}
+    </if>
+    <if test="type!=null and type!=''">
+    	and M.TYPE=#{type,jdbcType=VARCHAR}
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and M.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+    ORDER BY M.NAME DESC
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.resource.entity.Resource">
+  	insert into CMS_RESOURCE(ID,NAME,RELATION_ID,TYPE,SUMMARY,URL,FRONT_COVER,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{relation.id,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{summary,jdbcType=VARCHAR},#{url,jdbcType=VARCHAR},
+  	#{frontCover,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.resource.entity.Resource">
+  	update CMS_RESOURCE
+  	<set >
+      <if test="url != null and url!=''" >
+        URL = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null and summary!=''" >
+        SUMMARY = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="frontCover != null and frontCover!=''" >
+        FRONT_COVER = #{frontCover,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_RESOURCE
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.resource.entity.Resource">
+  	  update CMS_RESOURCE
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relation.id,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

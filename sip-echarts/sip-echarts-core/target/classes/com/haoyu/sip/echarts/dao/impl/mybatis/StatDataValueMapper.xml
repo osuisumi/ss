@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.echarts.dao.impl.mybatis.StatDataValueMapper" >
+  <resultMap id="StatDataValueResultMap" type="com.haoyu.sip.echarts.entity.StatDataValue" >
+    <result column="COLUMN_FIELD_NAME" property="columnFieldName" jdbcType="VARCHAR" />
+    <result column="ROW_FIELD_NAME" property="rowFieldName" jdbcType="VARCHAR" />
+    <result column="DATA_VALUE" property="dataValue" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.COLUMN_FIELD_NAME,M.ROW_FIELD_NAME,M.DATA_VALUE
+  </sql>
+  <select id="selectStatDataValueByStatChartsParam" resultMap="StatDataValueResultMap" parameterType="com.haoyu.sip.echarts.entity.StatChartsParam" >
+    select 
+    <include refid="Base_Column_List"/>
+    from STAT_DATA_VALUE M
+    where STAT_CHARTS_PARAMID=#{statChartsParam.id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.echarts.entity.StatDataValue">
+  	insert into STAT_DATA_VALUE(STAT_CHARTS_PARAMID,COLUMN_FIELD_NAME,ROW_FIELD_NAME,DATA_VALUE)
+  	values(#{statChartsParam.id,jdbcType=VARCHAR},#{columnFieldName,jdbcType=VARCHAR},#{relation.id,jdbcType=VARCHAR},#{rowFieldName,jdbcType=VARCHAR},#{dataValue,jdbcType=FLOAT})
+  </insert>
+  <delete id="deleteByPhysics" parameterType="com.haoyu.sip.echarts.entity.StatChartsParam">
+  	delete STAT_DATA_VALUE
+    where STAT_CHARTS_PARAMID=#{id,jdbcType=VARCHAR}
+  </delete>
+</mapper>

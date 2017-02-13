@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.cms.channel.dao.impl.mybatis.ChannelMapper" >
+  <resultMap id="ChannelResultMap" type="com.haoyu.sip.cms.channel.entity.Channel" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DISPLAY_TYPE" property="displayType" jdbcType="VARCHAR" />
+    <result column="ALIAS" property="alias" jdbcType="VARCHAR" />
+    <result column="DES" property="des" jdbcType="VARCHAR" />
+    <result column="ORDER_NO" property="orderNo" jdbcType="INTEGER" />
+    <result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="parent" javaType="com.haoyu.sip.cms.channel.entity.Channel">
+    	<id column="PARENT_ID" property="id"/>
+    	<id column="PARENT_ALIAS" property="alias"/>
+    	<result column="PARENT_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.NAME,M.DISPLAY_TYPE,M.STATE,M.ALIAS,M.DES,M.URL,M.ORDER_NO,M.RELATION_ID,MP.ID PARENT_ID,MP.NAME PARENT_NAME,MP.ALIAS PARENT_ALIAS,M.CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ChannelResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_CHANNEL M
+    left join CMS_CHANNEL MP
+    on MP.ID = M.PARENT_ID
+    and MP.IS_DELETED='N'
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+    <select id="selectByParameter" resultMap="ChannelResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_CHANNEL M
+    left join CMS_CHANNEL MP
+    on MP.ID = M.PARENT_ID
+    and MP.IS_DELETED='N'
+    where M.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	 <bind name="pattern" value="'%' + name + '%'" />
+    	and M.NAME LIKE  #{pattern}
+    </if>
+    <if test="alias!=null and alias!=''">
+    	and M.ALIAS= #{alias,jdbcType=VARCHAR}
+    </if>
+    <if test="domain!=null and domain!=''">
+    	 <bind name="pattern" value="'%' + domain + '%'" />
+    	and M.RELATION_ID=(select MAX(ID) from CMS_SITE_INFO CSI WHERE CSI.IS_DELETED='N' AND CSI.DOMAIN LIKE  #{pattern})
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and M.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+    <if test="parent!=null and parent.id!=null">
+    	and M.PARENT_ID=#{parent.id,jdbcType=VARCHAR}
+    </if>
+    <if test="parentAlias!=null and parentAlias!=null">
+    	and M.PARENT_ID=(SELECT ID FROM CMS_CHANNEL WHERE ALIAS=#{parentAlias,jdbcType=VARCHAR})
+    </if>
+    <if test="parentId!=null and parentId!=null">
+    	<choose>
+    		<when test="parentId=='isNull'">
+    			and (M.PARENT_ID IS NULL OR  M.PARENT_ID='')
+    		</when>
+    		<otherwise>
+    			and M.PARENT_ID=#{parentId,jdbcType=VARCHAR}
+    		</otherwise>
+    	</choose>
+    </if>
+    <if test="userId!=null and userId!=''">
+    	and exists(select 1 from auth_user_role aur
+		join auth_role_permission arp
+		on aur.ROLE_ID=arp.ROLE_ID
+		join auth_permission ap
+		on ap.id=arp.permission_id
+		where ap.is_deleted='N'
+		AND AP.RESOURCE_ID=M.ID
+		AND aur.USER_ID=#{userId,jdbcType=VARCHAR})
+    </if>
+    ORDER BY M.ORDER_NO
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.channel.entity.Channel">
+  	insert into CMS_CHANNEL(ID,NAME,DISPLAY_TYPE,ALIAS,STATE,DES,ORDER_NO,RELATION_ID,PARENT_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{displayType,jdbcType=VARCHAR},#{alias,jdbcType=VARCHAR},#{state,jdbcType=VARCHAR},
+  	#{des,jdbcType=VARCHAR},#{orderNo,jdbcType=INTEGER},#{relationId,jdbcType=VARCHAR},
+  	<choose>
+  		<when test="parent!=null and parent.id!=null and parent.id!=''">
+  			#{parent.id,jdbcType=VARCHAR}
+  		</when>
+  		<otherwise>
+  			null
+  		</otherwise>
+  	</choose>
+  	,#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.channel.entity.Channel">
+  	update CMS_CHANNEL
+  	<set >
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayType != null and displayType!=''" >
+        DISPLAY_TYPE = #{displayType,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null and state!=''" >
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="des != null and des!=''" >
+        DES = #{des,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null and orderNo!=''" >
+        ORDER_NO = #{orderNo,jdbcType=INTEGER},
+      </if>
+      <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_CHANNEL
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.channel.entity.Channel">
+  	  update CMS_CHANNEL
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relationId,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

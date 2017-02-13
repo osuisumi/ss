@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.sign.dao.impl.mybatis.SignStatMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.sign.entity.SignStat">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR" />
+		<result column="LAST_SIGN_TIME" property="lastSignTime" jdbcType="TIMESTAMP" />
+		<result column="SIGN_LAST_NUM" property="signLastNum" jdbcType="DECIMAL" />
+		<result column="SIGN_NUM" property="signNum" jdbcType="DECIMAL" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="DECIMAL" />
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="RANK" property="rank" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, RELATION_ID, LAST_SIGN_TIME, SIGN_LAST_NUM, SIGN_NUM, CREATE_TIME, CREATOR
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from SIGN_STAT
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.sign.entity.SignStat">
+		insert into SIGN_STAT
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="relation.id != null">
+				RELATION_ID,
+			</if>
+			<if test="lastSignTime != null">
+				LAST_SIGN_TIME,
+			</if>
+			<if test="signLastNum != null">
+				SIGN_LAST_NUM,
+			</if>
+			<if test="signNum != null">
+				SIGN_NUM,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation.id != null">
+				#{relation.id,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastSignTime != null">
+				#{lastSignTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="signLastNum != null">
+				#{signLastNum,jdbcType=DECIMAL},
+			</if>
+			<if test="signNum != null">
+				#{signNum,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.sign.entity.SignStat">
+		update SIGN_STAT SS
+		<set>
+			<if test="signLastNum != null">
+				SIGN_LAST_NUM = #{signLastNum, jdbcType=DECIMAL},
+			</if>
+			<if test="lastSignTime != null">
+				LAST_SIGN_TIME = #{lastSignTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="signNum != null and signNum > 0">
+				SIGN_NUM = (select count(T.ID) from (select * from SIGN_USER where SIGN_STAT_ID = #{id,jdbcType=VARCHAR} and IS_DELETED = 'N') T),
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=DECIMAL},
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<select id="selectRank" parameterType="map" resultMap="BaseResultMap">
+		select T.CREATOR, T.SIGN_NUM,
+			(
+				select count(1) + 1 from
+					(
+						select CREATOR, SIGN_NUM from SIGN_STAT where RELATION_ID = #{relationId, jdbcType=VARCHAR} and IS_DELETED = 'N'
+					) T1 
+				where T1.SIGN_NUM > T.SIGN_NUM
+			) AS RANK
+		from
+			(
+				select CREATOR, SIGN_NUM from SIGN_STAT where RELATION_ID = #{relationId, jdbcType=VARCHAR} and IS_DELETED = 'N'
+			) T
+		<if test="userId != null and userId != ''">
+			where T.CREATOR = #{userId, jdbcType=VARCHAR}
+		</if>
+	</select>
+	<select id="getCount" parameterType="map" resultType="int">
+		select count(1)
+		from SIGN_STAT SS
+		where SS.IS_DELETED = 'N'
+		<if test="relationId != null and relationId != ''">
+			and RELATION_ID = #{relationId}
+		</if>
+		<if test="lastSignTime != null and lastSignTime != ''">
+			and LAST_SIGN_TIME = #{lastSignTime, jdbcType=TIMESTAMP}
+		</if>
+	</select>
+</mapper>

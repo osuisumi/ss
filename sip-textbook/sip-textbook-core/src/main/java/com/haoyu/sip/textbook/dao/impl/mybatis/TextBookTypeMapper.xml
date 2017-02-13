@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.textbook.dao.impl.mybatis.TextBookTypeMapper">
+	<resultMap type="com.haoyu.sip.textbook.entity.TextBookType" id="TextBookTypeResultMap">
+		<id column="TEXT_BOOK_TYPE_CODE" property="textBookTypeCode" jdbcType="VARCHAR" />
+		<result column="TEXT_BOOK_VALUE" property="textBookValue" jdbcType="VARCHAR" />
+		<result column="TEXT_BOOK_TYPE_NAME" property="textBookTypeName" jdbcType="VARCHAR" />
+		<result column="RANK" property="rank" jdbcType="INTEGER" />
+		<result column="PARENT_CODE" property="parentCode" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="INTEGER" />
+		<result column="VERSION" property="version" jdbcType="DECIMAL" />
+		<result column="IS_DELETED" property="isDeleted" jdbcType="CHAR" />
+		<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+			<id property="id" column="CREATOR_ID" />
+			<result property="realName" column="CREATOR_REAL_NAME" />
+		</association>
+	</resultMap>
+
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="TextBookTypeResultMap">
+		select
+		TBC.TEXT_BOOK_TYPE_CODE,TBC.TEXT_BOOK_VALUE,TBC.TEXT_BOOK_TYPE_NAME
+		from TEXT_BOOK_TYPE TBC
+		where TBC.IS_DELETED = 'N'
+		and TBC.TEXT_BOOK_TYPE_CODE=#{id,jdbcType=VARCHAR}
+	</select>
+
+	<select id="select" parameterType="com.haoyu.sip.textbook.entity.TextBookType" resultMap="TextBookTypeResultMap">
+		select
+		TBC.TEXT_BOOK_TYPE_CODE,TBC.TEXT_BOOK_VALUE,TBC.TEXT_BOOK_TYPE_NAME
+		from TEXT_BOOK_TYPE TBC
+		where TBC.IS_DELETED = 'N'
+	</select>
+
+
+	<update id="deleteByLogic" parameterType="java.lang.String">
+		update TEXT_BOOK_TYPE_CODE TBC
+		set TBC.IS_DELETED = 'Y'
+		where TBC.ID=#{id,jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteByPhysics" parameterType="java.lang.String">
+		delete from TEXT_BOOK_TYPE_CODE TBC
+		where TBC.ID=#{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.haoyu.sip.textbook.entity.TextBookType">
+		insert into TEXT_BOOK_TYPE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="textBookTypeCode!=null">
+				TEXT_BOOK_TYPE_CODE,
+			</if>
+			<if test="textBookTypeName!=null">
+				TEXT_BOOK_TYPE_NAME,
+			</if>
+			<if test="textBookValue!=null">
+				TEXT_BOOK_VALUE,
+			</if>
+			<if test="rank!=null">
+				RANK,
+			</if>
+			<if test="parentCode!=null">
+				PARENT_CODE,
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				CREATOR,
+			</if>
+			<if test="createTime">
+				CREATE_TIME,
+			</if>
+			<if test="updateTime">
+				UPDATE_TIME,
+			</if>
+			<if test="version">
+				VERSION,
+			</if>
+			<if test="isDeleted">
+				IS_DELETED,
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="textBookTypeCode!=null">
+				#{textBookTypeCode},
+			</if>
+			<if test="textBookTypeName!=null">
+				#{textBookTypeName},
+			</if>
+			<if test="textBookValue!=null">
+				#{textBookValue},
+			</if>
+			<if test="rank!=null">
+				#{rank},
+			</if>
+			<if test="parentCode!=null">
+				#{parentCode},
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				#{creator.id},
+			</if>
+			<if test="createTime">
+				#{createTime},
+			</if>
+			<if test="updateTime">
+				#{updateTime},
+			</if>
+			<if test="version">
+				#{version},
+			</if>
+			<if test="isDeleted">
+				#{isDeleted},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

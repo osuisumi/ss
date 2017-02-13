@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.dynamic.dao.impl.mybatis.DynamicMapper">
+	<resultMap type="com.haoyu.sip.dynamic.entity.Dynamic" id="DynamicResult">
+		<id column="ID" property="id"></id>
+		<result column="DYNAMIC_SOURCE_ID" property="dynamicSourceId" jdbcType="VARCHAR" />
+		<result column="DYNAMIC_SOURCE_TYPE" property="dynamicSourceType" jdbcType="VARCHAR"></result>
+		<result column="DYNAMIC_SOURCE_RELATION_ID" property="dynamicSourceRelation.id" jdbcType="VARCHAR" />
+		<result column="DYNAMIC_SOURCE_RELATION_TYPE" property="dynamicSourceRelation.type" jdbcType="VARCHAR" />
+		<result column="CONTENT" property="content" jdbcType="VARCHAR" />
+		<result column="REPLY_NUM" property="replyNum" jdbcType="INTEGER"/>
+		<result column="BROWSE_NUM" property="browseNum" jdbcType="INTEGER"/>
+		<result column="FOWORD_NUM" property="fowordNum" jdbcType="INTEGER"/>
+		<result column="SUPPORT_NUM" property="supportNum" jdbcType="INTEGER"/>
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="REAL_NAME" property="creator.realName" jdbcType="VARCHAR" />	
+		<result column="AVATAR" property="creator.avatar" jdbcType="VARCHAR" />	
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="BASE_COLUMN">
+		D.ID,D.DYNAMIC_SOURCE_ID,D.DYNAMIC_SOURCE_TYPE,D.DYNAMIC_SOURCE_RELATION_ID,D.DYNAMIC_SOURCE_RELATION_TYPE,D.CONTENT,D.REPLY_NUM,D.BROWSE_NUM,D.FOWORD_NUM,D.SUPPORT_NUM,D.CREATOR,D.CREATE_TIME
+	</sql>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="DynamicResult">
+		select <include refid="BASE_COLUMN"></include>
+		from DYNAMIC D
+		where D.IS_DELETED='N'
+		and D.ID = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<select id="select" parameterType="com.haoyu.sip.dynamic.entity.Dynamic" resultMap="DynamicResult">
+		select <include refid="BASE_COLUMN"></include>
+		from DYNAMIC D
+		where D.IS_DELETED='N'
+		<if test="dynamicSourceRelation!=null and dynamicSourceRelation.id!=null">
+			and D.DYNAMIC_SOURCE_RELATION_ID = #{dynamicSourceRelation.id}
+		</if>
+		<if test="creator!=null and creator.id!=null">
+			and D.CREATOR = #{creator.id}
+		</if>
+		order by CREATE_TIME desc
+	</select>
+	<!-- 查询动态    最初需求：查出五条最新动态   hqy-->
+	<select id="selectDynamic" parameterType="java.util.Map" resultMap="DynamicResult">
+		select D.ID,D.DYNAMIC_SOURCE_ID,D.DYNAMIC_SOURCE_TYPE,D.DYNAMIC_SOURCE_RELATION_ID,
+		D.DYNAMIC_SOURCE_RELATION_TYPE,D.CONTENT,D.CREATE_TIME,BUV.ID CREATOR,BUV.REAL_NAME REAL_NAME,BUV.AVATAR AVATAR
+		from DYNAMIC D
+		join BASE_USER_VIEW BUV
+		on BUV.ID = D.CREATOR
+		<if test="deptId != null and deptId != '' ">
+			and BUV.DEPT_ID = #{deptId,jdbcType=VARCHAR}
+		</if>
+		<if test="relationType != null and relationType != ''">
+			and DYNAMIC_SOURCE_RELATION_TYPE = #{relationType,jdbcType=VARCHAR}
+		</if>
+		where D.IS_DELETED='N'
+	</select>
+	
+	<select id="selectByParameter" parameterType="map" resultMap="DynamicResult">
+		select <include refid="BASE_COLUMN"></include>
+		,BUV.REAL_NAME
+		from DYNAMIC D
+		join BASE_USER_VIEW BUV on BUV.ID = D.CREATOR
+		where IS_DELETED = 'N'
+		<if test="creators != null">
+			and D.CREATOR in
+			<foreach collection="creators" open="(" close=")" item="creator" separator=",">
+				#{creator,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		<if test="dynamicSourceRelationIdExlution != null">
+			and (D.DYNAMIC_SOURCE_RELATION_ID not in
+			<foreach collection="dynamicSourceRelationIdExlution" open="(" close=")" item="item" separator=",">
+				#{item,jdbcType=VARCHAR}
+			</foreach>
+			or D.DYNAMIC_SOURCE_RELATION_ID is null)
+		</if>
+		<if test="dynamicSourceIdExlution != null">
+			and D.DYNAMIC_SOURCE_ID not in
+			<foreach collection = "dynamicSourceIdExlution" open="(" close=")" item="item" separator=",">
+				#{item,jdbcYype=VARCHAR}
+			</foreach>
+		</if>
+	</select>
+	
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.dynamic.entity.Dynamic">
+		update DYNAMIC D
+		<set>
+			<if test="replyNum != null and replyNum >0">
+				REPLY_NUM = (select count(C.ID) from COMMENTS C where C.IS_DELETED = 'N' and C.RELATION_TYPE='dynamic' and C.RELATION_ID = #{id,jdbcType=VARCHAR}),
+			</if>
+			<if test="supportNum != null and supportNum >0">
+				SUPPORT_NUM = (select count(ID) from ATTITUDE_USER where RELATION_ID =D.ID and ATTITUDE = 'support' and IS_DELETED='N'),
+			</if>
+		</set>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="update" parameterType="map">
+		update DYNAMIC D
+		<set>
+			<if test="entity.browseNum != null and entity.browseNum >0">
+				BROWSE_NUM = BROWSE_NUM +1
+			</if>
+		</set>
+		,VERSION = VERSION + 1
+		where id in
+		<foreach collection="ids" open="(" close=")" item="id" separator=",">
+			#{id,jdbcType=VARCHAR}
+		</foreach>
+	</update>
+	
+	<update id="deleteByLogic" parameterType="java.lang.String">
+		update DYNAMIC
+		set IS_DELETED = 'Y'
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="batchDelete" parameterType="java.util.List">
+		delete from DYNAMIC
+		where ID in
+		<foreach collection="list" open="(" close=")" item="item" separator=",">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+
+
+	<insert id="insert" parameterType="com.haoyu.sip.dynamic.entity.Dynamic">
+		insert into DYNAMIC
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				ID,
+			</if>
+			<if test="dynamicSourceId!=null">
+				DYNAMIC_SOURCE_ID,
+			</if>
+			<if test="dynamicSourceType!=null">
+				DYNAMIC_SOURCE_TYPE,
+			</if>
+			<if test="dynamicSourceRelation!=null and dynamicSourceRelation.id!=null">
+				DYNAMIC_SOURCE_RELATION_ID,
+			</if>
+			<if test="dynamicSourceRelation!=null and dynamicSourceRelation.type!=null">
+				DYNAMIC_SOURCE_RELATION_TYPE,
+			</if>
+			<if test="content!=null">
+				CONTENT,
+			</if>
+			<if test="replyNum != null">
+				REPLY_NUM,
+			</if>
+			<if test="browseNum != null">
+				BROWSE_NUM,
+			</if>
+			<if test="fowordNum != null">
+				FOWORD_NUM,
+			</if>
+			<if test="supportNum != null">
+				SUPPORT_NUM,
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				CREATOR,
+			</if>
+			<if test="createTime!=null">
+				CREATE_TIME,
+			</if>
+			<if test="updateTime!=null">
+				UPDATE_TIME,
+			</if>
+			<if test="updatedby!=null">
+				UPDATEDBY,
+			</if>
+			<if test="isDeleted!=null">
+				IS_DELETED,
+			</if>
+			<if test="version!=null">
+				VERSION,
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="dynamicSourceId!=null">
+				#{dynamicSourceId},
+			</if>
+			<if test="dynamicSourceType!=null">
+				#{dynamicSourceType},
+			</if>
+			<if test="dynamicSourceRelation!=null and dynamicSourceRelation.id!=null">
+				#{dynamicSourceRelation.id},
+			</if>
+			<if test="dynamicSourceRelation!=null and dynamicSourceRelation.type!=null">
+				#{dynamicSourceRelation.type},
+			</if>
+			<if test="content!=null">
+				#{content},
+			</if>
+			<if test="replyNum != null">
+				#{replyNum},
+			</if>
+			<if test="browseNum != null">
+				#{browseNum},
+			</if>
+			<if test="fowordNum != null">
+				#{fowordNum},
+			</if>
+			<if test="supportNum != null">
+				#{supportNum},
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				#{creator.id},
+			</if>
+			<if test="createTime!=null">
+				#{createTime},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime},
+			</if>
+			<if test="updatedby!=null">
+				#{updatedBy},
+			</if>
+			<if test="isDeleted!=null">
+				#{isDeleted},
+			</if>
+			<if test="version!=null">
+				#{version},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

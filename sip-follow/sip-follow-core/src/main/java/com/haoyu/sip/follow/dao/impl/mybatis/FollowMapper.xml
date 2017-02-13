@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.follow.dao.impl.mybatis.FollowMapper" >
+  <resultMap type="com.haoyu.sip.follow.entity.Follow" id="FollowResultMap">
+  	<id property="id" column="ID" jdbcType="VARCHAR"/>
+  	<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+	    	<id property="id" column="USER_ID"/>
+	    	<result property="realName" column="REAL_NAME"/>
+	    	<result property="avatar" column="AVATAR"/>
+	</association>
+	<association property="followEntity" javaType="com.haoyu.sip.core.entity.Relation">
+  		<id property="id" column="FOLLOWED_ID"/>
+  		<result property="type" column="FOLLOWED_TYPE"/>
+  	</association>
+  </resultMap>
+  <resultMap type="com.haoyu.sip.follow.entity.FollowStat" id="FollowStatResultMap">
+  	<id property="followedId" column="FOLLOW_ID" jdbcType="VARCHAR"/>
+  	<result property="followNum" column="FOLLOW_NUM" jdbcType="INTEGER"/>  
+  </resultMap>
+  <sql id="FollowColumn">
+  	F.ID,F.FOLLOWED_ID,F.FOLLOWED_TYPE,F.CREATE_TIME
+  	,BUV.ID USER_ID,BUV.REAL_NAME,BUV.AVATAR
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="FollowResultMap">
+  	select F.ID,F.FOLLOWED_ID,F.FOLLOWED_TYPE
+  	from FOLLOW F
+  	where F.IS_DELETED='N'
+  	and F.id=#{id}
+  	<!--  select <include refid="FollowColumn"/>
+  	from FOLLOW F
+  	join BASE_USER_VIEW BUV 
+  	where F.ID=#{id,jdbcType=VARCHAR}
+  	-->
+  </select>
+  <select id="selectByFollow"  parameterType="com.haoyu.sip.follow.entity.Follow" resultMap="FollowResultMap">
+  	select <include refid="FollowColumn"/>
+  	from FOLLOW F
+  	join BASE_USER_VIEW BUV on BUV.ID = F.CREATOR
+  	where F.IS_DELETED='N'
+  	<if test="followEntity!=null and followEntity.id!=null">
+  		AND F.FOLLOWED_ID=#{followEntity.id,jdbcType=VARCHAR}
+  	</if>
+  	<if test="followEntity!=null and followEntity.type!=null">
+  		AND F.FOLLOWED_TYPE=#{followEntity.type,jdbcType=VARCHAR}
+  	</if>
+  	<if test="creator!=null and creator.id!=null">
+  		AND F.CREATOR=#{creator.id,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  <select id="selectFollowByUserAndFolloweds" parameterType="java.util.Map" resultMap="FollowResultMap">
+  	select <include refid="FollowColumn"/>
+  	from FOLLOW F
+  	join BASE_USER_VIEW BUV on BUV.ID = F.CREATOR
+  	where F.IS_DELETED='N'
+  	<if test="followedIds!=null">
+  		AND F.FOLLOWED_ID IN
+  		<foreach collection="followedIds" item="followedId" open="(" close=")" separator=",">
+  			#{followedId,jdbcType=VARCHAR}
+  		</foreach>
+  	</if>
+  	<if test="followedType!=null">
+  		AND F.FOLLOWED_TYPE=#{followedType,jdbcType=VARCHAR}
+  	</if>
+  	<if test="userId!=null">
+  		AND F.CREATOR=#{userId,jdbcType=VARCHAR}
+  	</if>
+  	<!-- 
+  	<if test="creator!=null and creator.id!=null">
+  		AND F.CREATOR=#{userId,jdbcType=VARCHAR}
+  	</if>
+  	 -->
+  </select>
+  <select id="selectFollowStatByFollowEntity" parameterType="com.haoyu.sip.core.entity.Relation" resultMap="FollowStatResultMap">
+  	select FOLLOWED_ID, COUNT(F.ID) FOLLOW_NUM
+  	from FOLLOW F
+  	where F.IS_DELETED='N'
+  	<if test="id!=null and id!=''">
+  		and F.FOLLOWED_ID=#{id,jdbcType=VARCHAR}
+  	</if>
+  	<if test="type!=null and type!=''">
+  		AND F.FOLLOWED_TYPE=#{type,jdbcType=VARCHAR}
+  	</if>
+  	GROUP BY FOLLOWED_ID
+  </select>
+  <select id="selectFollowStatByFolloweds" parameterType="java.util.List" resultMap="FollowStatResultMap">
+  	select FOLLOWED_ID, COUNT(F.ID) FOLLOW_NUM
+  	from FOLLOW F
+  	where F.IS_DELETED='N'
+	AND FOLLOWED_ID IN
+	<foreach collection="list" item="followedId" open="(" close=")" separator=",">
+		#{followedId,jdbcType=VARCHAR}
+	</foreach>
+  	GROUP BY FOLLOWED_ID
+  </select>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.follow.entity.Follow">
+  	update FOLLOW 
+  	set IS_DELETED='Y'
+  	,UPDATE_TIME=#{updateTime,jdbcType=BIGINT}
+  	<if test="updatedby!=null and updatedby.id!=null">
+  		,UPDATED_BY=#{updatedby,jdbcType=VARCHAR}
+  	</if>
+  	,VERSION =VERSION+1
+  	where 
+  	<choose>
+  		<when test="id!=null and id!=''">
+  			AND ID=#{id,jdbcType=VARCHAR}
+  		</when>
+  		<otherwise>
+  			FOLLOWED_ID=#{followEntity.id,jdbcType=VARCHAR}
+		  	<if test="followEntity.type!=null and followEntity.type!=''">
+		  		AND FOLLOWED_TYPE=#{followEntity.type,jdbcType=VARCHAR}
+		  	</if>
+		  	<if test="creator!=null and creator.id!=null">
+		  		AND CREATOR=#{creator.id,jdbcType=VARCAHR}
+		  	</if>
+  		</otherwise>
+  	</choose>
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String" >
+    delete from FOLLOW
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.haoyu.sip.follow.entity.Follow" >
+    insert into FOLLOW (ID, FOLLOWED_ID, FOLLOWED_TYPE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{followEntity.id,jdbcType=VARCHAR}, #{followEntity.type,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},
+  	#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertFollowStat" parameterType="com.haoyu.sip.follow.entity.FollowStat">
+  	insert into FOLLOW_STAT(FOLLOWED_ID,FOLLOW_NUM)
+  	values(#{followedId, jdbcType=VARCHAR}, #{followNum, jdbcType=DECIMAL})
+  </insert>
+  <update id="updateFollowStat" parameterType="string">
+  	update FOLLOW_STAT FS
+  	set FOLLOW_NUM = (select count(F.ID) from FOLLOW F where F.FOLLOWED_ID = FS.FOLLOWED_ID and F.IS_DELETED = 'N')
+  	where FOLLOWED_ID = #{followedId, jdbcType=VARCHAR}
+  </update>
+  
+	<select id="selectFollowStat" parameterType="map" resultMap="FollowStatResultMap">
+	  	select 
+	  		FOLLOWED_ID FOLLOW_ID, 
+	  		FOLLOW_NUM
+	  	from 
+	  		FOLLOW_STAT FS
+	  	where 
+	  		FS.FOLLOWED_ID in 
+			<foreach collection="followedIds" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+	</select>
+	
+	<select id="selectFollow" parameterType="map" resultMap="FollowResultMap">
+		select
+			F.ID,
+			F.FOLLOWED_ID,
+			F.FOLLOWED_TYPE,
+			F.CREATOR,
+			F.CREATE_TIME,
+			BUV.REAL_NAME, 
+			BUV.AVATAR,
+			BUV.ID USER_ID
+		from
+			FOLLOW F
+		join BASE_USER_VIEW BUV on BUV.ID = F.CREATOR
+		where
+			F.IS_DELETED = 'N'
+			<if test="relationIds != null">
+				and F.FOLLOWED_ID in
+				<foreach collection="relationIds" open="(" close=")" separator="," item="item">
+					#{item}
+				</foreach>
+			</if>
+			<if test="relationType != null and relationType != ''">
+				and F.FOLLOWED_TYPE = #{relationType, jdbcType=VARCHAR}
+			</if>
+			<if test="relationId != null and relationId != ''">
+				and F.FOLLOWED_ID = #{relationId, jdbcType=VARCHAR}
+			</if>
+			<if test="creatorId != null and creatorId != ''">			    
+				and F.CREATOR = #{creatorId, jdbcType=VARCHAR}
+			</if>
+	</select>
+</mapper>

@@ -1,0 +1,2 @@
+com\haoyu\sip\login\adaptors\jdbc\AbstractJdbcUsernamePasswordAuthenticationHandler.class
+com\haoyu\sip\login\adaptors\jdbc\QueryDatabaseAuthenticationHandler.class

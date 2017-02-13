@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.tag.dao.impl.mybatis.TagRelationMapper" >
+  <resultMap type="com.haoyu.sip.tag.entity.TagRelation" id="baseResultMap">
+  	<result column="TAG_ID" property="tag.id"/>
+  	<result column="RELATION_ID" property="relation.id"/>
+  </resultMap>
+  <delete id="deleteByTagRelation" parameterType="com.haoyu.sip.tag.entity.TagRelation" >
+    delete from TAG_RELATION
+    where RELATION_ID = #{relation.id,jdbcType=VARCHAR}
+    <if test="tag!=null and tag.id!=null">
+    	AND TAG_ID=#{tag.id,jdbcType=VARCHAR}
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.haoyu.sip.tag.entity.TagRelation" >
+    insert into TAG_RELATION (TAG_ID, RELATION_ID, TYPE)
+    values (#{tag.id,jdbcType=VARCHAR}, #{relation.id,jdbcType=VARCHAR}, #{relation.type,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertByTagsAndRelation" parameterType="java.util.Map">
+  	insert into TAG_RELATION(TAG_ID, RELATION_ID, TYPE)
+  	select ID, #{tagRelation.relation.id,jdbcType=VARCHAR}, #{tagRelation.relation.type,jdbcType=VARCHAR}
+  	from TAG
+  	where ID in
+  	<foreach collection="tags" item="tag" open="(" close=")" separator="," > 
+  		<if test="tag!=null and tag.id!=null">
+  			#{tag.id}
+  		</if>
+  	</foreach>
+  </insert>
+  
+  <select id="selectByParameter" parameterType="java.util.Map" resultMap="baseResultMap">
+  	select TAG_ID,RELATION_ID from TAG_RELATION TR
+  	<if test="relationIds != null">
+  	  	where TR.RELATION_ID in
+	  	<foreach collection="relationIds" open="(" close=")" item="rid"  separator=",">
+	  		#{rid}
+	  	</foreach>
+  	</if>
+
+  </select>
+</mapper>

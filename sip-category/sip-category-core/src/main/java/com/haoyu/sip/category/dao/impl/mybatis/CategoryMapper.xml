@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.category.dao.impl.mybatis.CategoryMapper" >
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.category.entity.Category" >
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<result column="PARENTCATEGORY_ID" property="parentCategory.id" jdbcType="VARCHAR" />
+		<result column="RELATION_ID" property="categoryRelation.relation.id" jdbcType="VARCHAR" />
+		<result column="RELATION_TYPE" property="categoryRelation.relation.type" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="select" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select
+	    	C.ID,
+	    	C.NAME,
+	    	C.TYPE,
+	    	C.PARENT_ID PARENTCATEGORY_ID,
+	    	C.CREATE_TIME,
+	    	CR.RELATION_ID RELATION_ID,
+	    	CR.RELATION_TYPE RELATION_TYPE
+	    from
+	    	CATEGORY C
+	    join CATEGORY_RELATION CR on CR.CATEGORY_ID = C.ID and CR.IS_DELETED = 'N'
+		join BASE_USER_VIEW BUV on BUV.ID = C.CREATOR 
+	    where
+	    	C.IS_DELETED = 'N'
+		<if test="name != null and name != ''">
+			and C.NAME like '%${name}%'
+		</if>
+		<if test="type != null and type != ''">
+			and C.TYPE = #{type,jdbctype=VARCHAR}
+		</if>
+		<if test="creator != null and creator.id != '' and creator.id != null">
+			and C.CREATOR = #{creator,jdbcType=VARCHAR}
+		</if>
+	    <if test="parentCategory != null and parentCategory.id != null and parentCategory.id != ''">
+			and C.PARENT_ID = #{parentCategory.id,jdbcType=VARCHAR}
+		</if>
+	    <if test="relation != null and relation.id != null and relation.id != ''">
+			and CR.RELATION_ID = #{relation.id,jdbcType=VARCHAR}
+		</if>
+	    <if test="relation != null and relation.type != null and relation.type != ''">
+			and CR.RELATION_TYPE = #{relation.type,jdbcType=VARCHAR}
+		</if>
+		order by C.CREATE_TIME	desc		
+	</select>
+		
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		where N.IS_DELETED = 'N'
+			and  N.ID = #{id,jdbcType=VARCHAR} 
+	</select>
+	
+	<insert id="insert" parameterType="com.haoyu.sip.category.entity.Category">
+		insert into CATEGORY 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+			<if test="parentCategory != null and parentCategory.id != null and parentCategory.id != ''">
+				PARENT_ID,
+			</if>
+			<if test="creator != null and creator.id != null and creator.id != ''">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="parentCategory != null and parentCategory.id != null and parentCategory.id != ''">
+				#{parentCategory.id ,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null and creator.id != ''">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.category.entity.Category">
+		update CATEGORY
+		<set>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				TYPE = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="parentCategory != null and parentCategory.id != null and parentCategory.id != ''">
+				PARENT_ID = #{parentCategory.id ,jdbcType=VARCHAR},
+			</if>
+			<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.category.entity.Category">
+		update CATEGORY
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=DECIMAL}
+		<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+		</if>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+</mapper>

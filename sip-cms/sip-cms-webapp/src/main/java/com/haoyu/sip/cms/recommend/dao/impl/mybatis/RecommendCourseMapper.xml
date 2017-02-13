@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.recommend.dao.impl.mybatis.RecommendCourseMapper" >
+  <resultMap id="RecommendCourseResultMap" type="com.haoyu.sip.cms.recommend.entity.RecommendCourse" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />  
+    <result column="COURSE_NAME" property="courseName" jdbcType="VARCHAR" />
+    <result column="FRONT_COVER" property="frontCover" jdbcType="VARCHAR" />
+    <result column="STUDY_HOURS" property="studyHours" jdbcType="DECIMAL" />
+    <result column="AUTHOR" property="author" jdbcType="VARCHAR" />
+    <association property="recommend" javaType="com.haoyu.sip.cms.recommend.entity.Recommend">
+    	<id column="RECOMMEND_ID" property="id"/>
+    	<result column="ORDER_NO" property="orderNo" jdbcType="INTEGER" />
+    	<association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+	    	<id column="RELATION_ID" property="id"/>
+	    	<result column="RELATION_TYPE" property="type" jdbcType="VARCHAR" />
+	    </association>
+	    <association property="channel" javaType="com.haoyu.sip.cms.channel.entity.Channel">
+	    	<id column="CHANNEL_ID" property="id"/>
+	    	<result column="CHANNEL_NAME" property="name" jdbcType="VARCHAR" />
+	    </association>
+    </association>
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    C.ID,C.COURSE_NAME,C.FRONT_COVER,C.STUDY_HOURS,C.AUTHOR,
+    (CASE WHEN M.ORDER_NO IS NULL THEN 1000 ELSE M.ORDER_NO END) ORDER_NO,
+    M.RELATION_ID,M.RELATION_TYPE,CC.ID CHANNEL_ID,CC.NAME CHANNEL_NAME,M.ID RECOMMEND_ID
+  </sql>
+  <select id="selectByParameter" resultMap="RecommendCourseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from  VIEW_COURSE C
+    LEFT JOIN CMS_RECOMMEND M
+    ON M.RELATION_ID = C.ID
+    AND M.IS_DELETED='N'
+    <if test="channel!=null and channel.id!=null">
+    	and  M.CHANNEL_ID=#{channel.id,jdbcType=VARCHAR}
+    </if>
+    <if test="relationType!=null and relationType!=''">
+    	and M.RELATION_TYPE=#{relationType,jdbcType=VARCHAR}
+    </if>
+    LEFT JOIN CMS_CHANNEL CC
+    ON CC.ID=M.CHANNEL_ID
+   	<where>
+    <if test="courseName!=null and courseName!=''">
+    	 C.COURSE_NAME LIKE CONCAT('%',#{courseName,jdbcType=VARCHAR},'%' )  
+    </if>
+    </where>
+  </select>
+ 
+</mapper>

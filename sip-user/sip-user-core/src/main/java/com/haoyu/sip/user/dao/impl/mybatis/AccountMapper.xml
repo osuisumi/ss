@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.user.dao.impl.mybatis.AccountMapper" >
+	<resultMap id="AccountResultMap" type="com.haoyu.sip.user.entity.Account" >
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="USERNAME" property="userName" jdbcType="VARCHAR" />
+		<result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+		<result column="ROLECODE" property="roleCode" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<association property="user"  javaType="com.haoyu.sip.user.entity.UserInfo">
+			<id property="id" column="USERID"/>
+			<result property="realName" column="REALNAME"/>
+			<result property="paperworkNo" column="PAPERWORKNO"/>
+			<result property="bornDate" column="BORNDATE"/>
+			<result property="avatar" column="AVATAR"/>
+			<result property="summary" column="SUMMARY"/>
+			<result property="sex" column="SEX"/>
+			<result property="post" column="POST"/>
+			<result property="phone" column="PHONE"/>
+			<result property="email" column="EMAIL"/>
+			<association property="department"  javaType="com.haoyu.sip.user.entity.Department">
+				<id property="id" column="DEPARTMENTID"/>
+				<result property="deptName" column="DEPTNAME"/>
+				<result property="deptCode" column="DEPTCODE"/>
+				<result property="deptType" column="DEPTTYPE"/>
+				<result property="imageUrl" column="IMAGEURL"/>
+				<result property="stage" column="STAGE"/>
+				<result property="website" column="WEBSITE"/>
+			</association>
+		</association>
+		<collection property="roles" ofType="com.haoyu.sip.auth.entity.AuthRole">
+	    	<id column="ROLE_ID" property="id"/>
+	    	<result column="ROLE_NAME" property="name"/>
+	    </collection>
+	</resultMap>
+	<select id="selectByAccount" resultMap="AccountResultMap" parameterType="java.util.Map">
+		select 
+			TA.ID ID,
+			TA.USER_NAME USERNAME,
+			TA.ROLE_CODE ROLECODE,
+			TU.REAL_NAME REALNAME,
+			TD.DEPT_NAME DEPTNAME,
+			TU.SEX SEX,
+			TU.PHONE PHONE,
+			TU.EMAIL EMAIL,
+			TU.SUMMARY,
+			TU.PAPERWORK_NO PAPERWORKNO,
+			TA.CREATE_TIME CREATE_TIME,
+			TA.TYPE,
+			TA.USER_ID USERID,
+			A.ROLE_NAME ROLE_NAME,
+			A.ROLE_ID ROLE_ID
+		from
+			ACCOUNT TA
+	 	left join USER_INFO TU on TA.USER_ID = TU.ID and TU.IS_DELETED = 'N'
+		left join USER_DEPT TUD on TUD.USER_ID = TU.ID 
+		left join DEPARTMENT TD on TUD.DEPT_ID = TD.ID and TD.IS_DELETED = 'N'
+		left join
+		(
+			select
+				 AR.ID ROLE_ID,
+				 AUR.USER_ID USER_ID,
+				 AR.NAME ROLE_NAME
+			from
+				AUTH_USER_ROLE AUR
+			inner join AUTH_ROLE AR on AR.ID = AUR.ROLE_ID and AR.IS_DELETED='N'
+		) A on  A.USER_ID = TA.USER_ID
+		<trim prefix="where" prefixOverrides="and">
+			<if test="account.userName != null and account.userName != ''" >
+			 and TA.USER_NAME like '%${account.userName}%'  
+			</if>
+			<if test="account != null and account.type != null and account.type != ''" >
+			 and TA.TYPE = #{account.type,jdbcType=VARCHAR}
+			</if>
+			<if test="realName != null and realName != ''" >
+			 and TU.REAL_NAME like '%${realName}%' 
+			</if>
+			<if test="deptName != null and deptName != ''" >
+			 and TD.DEPT_NAME like '%${deptName}%' 
+			</if> 
+			<if test="roleId != null and roleId != ''">
+			 and A.ROLE_ID = #{roleId,jdbcType=VARCHAR}
+			</if>
+			<if test="account != null and account.roleCode !=null and account.roleCode !=''">
+			 and TA.ROLE_CODE = #{account.roleCode,jdbcType=VARCHAR}
+			</if>
+			 and TA.IS_DELETED = 'N' 
+		</trim>
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.user.entity.Account">
+		insert into ACCOUNT
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="userName != null and userName != ''">
+				USER_NAME,
+			</if>
+			<if test="password != null and password != ''">
+				PASSWORD,
+			</if>
+			<if test="roleCode != null">
+				ROLE_CODE,
+			</if>
+			<if test="state != null">
+				STATE,
+			</if>
+			<if test="user != null and user.id != null">
+				USER_ID,
+			</if>
+			<if test="creator != null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null and userName != ''">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null and password != ''">
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="roleCode != null">
+				#{roleCode,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="user != null and user.id != null">
+	    		#{user.id,jdbcType=VARCHAR},
+	    	</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="selectByPrimaryKey" resultMap="AccountResultMap" parameterType="java.lang.String" >
+		select
+			TA.ID ID,
+			TA.USER_NAME USERNAME ,
+			TA.PASSWORD PASSWORD,
+			TA.ROLE_CODE ROLECODE,
+			TU.ID USERID,
+			TU.REAL_NAME REALNAME,
+			TU.PAPERWORK_NO PAPERWORKNO,
+			TD.ID DEPARTMENTID,
+			TU.SEX SEX,
+			TU.PHONE PHONE,
+			TU.EMAIL EMAIL,
+			TU.SUMMARY,
+			TA.TYPE,
+			AUR.ROLE_ID ROLE_ID
+		from
+			ACCOUNT TA
+		left  join USER_INFO TU on TA.USER_ID  = TU.ID
+		left  join USER_DEPT TUD on TUD.USER_ID = TU.ID
+		left  join DEPARTMENT TD on TUD.DEPT_ID = TD.ID
+		left  join AUTH_USER_ROLE AUR on AUR.USER_ID = TA.USER_ID 
+		where
+			TA.IS_DELETED = 'N' and TA.ID = #{id,jdbcType=VARCHAR}
+  	</select>
+  	
+  	<select id="selectByUserId" resultMap="AccountResultMap" parameterType="java.lang.String">
+  		select 			
+  			TA.ID ID,
+			TA.USER_NAME USERNAME,
+			TA.PASSWORD PASSWORD
+		from ACCOUNT TA
+		where TA.IS_DELETED = 'N'
+		and TA.USER_ID = #{userId,jdbcType=VARCHAR}
+  	</select>
+  	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.user.entity.Account">
+	  	update ACCOUNT
+	  	<set>
+	      <if test="userName != null and userName != ''" >
+	        USER_NAME = #{userName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="updatedby != null and updatedby.id != null" >
+	        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+	      </if>
+	      <if test="updateTime != null" >
+	        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+	      </if>
+	      <if test="type != null" >
+	        TYPE = #{type,jdbcType=VARCHAR},
+	      </if>
+	      <if test="roleCode != null">
+	      	ROLE_CODE = #{roleCode,jdbcType=VARCHAR},
+	      </if>	      
+	      VERSION = VERSION+1
+	    </set>
+		where ID = #{id,jdbcType=VARCHAR}
+    </update>
+  	<update id="updateForResetPasswordyIds" parameterType="map">
+	  	update ACCOUNT
+	  	<set>
+	      <if test="password != null and password != ''" >
+	        PASSWORD = #{password,jdbcType=VARCHAR},
+	      </if>
+	      VERSION = VERSION+1
+	    </set>
+		where ID in 
+	  	<foreach collection="ids" open="(" close=")" item="id" separator=",">
+	  		#{id,jdbcType=VARCHAR}  	
+	  	</foreach>
+    </update>
+    <update id="batchDeleteByIds" parameterType="java.util.List">
+	  	update  ACCOUNT 
+	  	set IS_DELETED = 'Y'
+	  	where ID in
+	  	<foreach collection="list" open="(" close=")" item="id" separator=",">
+	  		#{id,jdbcType=VARCHAR}  	
+	  	</foreach>
+    </update>
+    <update id="batchDeleteByDepartmentIds" parameterType="java.util.List">
+		update ACCOUNT 
+		set IS_DELETED = 'Y'
+		where 
+		USER_ID in 
+			(
+				select TUD.USER_ID from USER_DEPT TUD 
+		     	WHERE TUD.DEPT_ID in
+		   	  	<foreach collection="list" open="(" close=")" item="id" separator=",">
+			  		#{id,jdbcType=VARCHAR}  	
+			  	</foreach>
+		 	)
+    </update>
+    <select id="getAccountCountByUsername" resultType="int" parameterType="java.lang.String">
+    	select 
+    		COUNT(ID) 
+    	from ACCOUNT
+    	where
+    	IS_DELETED = 'N'
+    	USER_NAME = #{userName}
+    </select>
+    <select id="getAccountCountForValidUserNameIsExist" resultType="int" parameterType="com.haoyu.sip.user.entity.Account">
+    	select 
+    		COUNT(ID) 
+    	from ACCOUNT
+    	<trim prefix="where" prefixOverrides="and">
+    		  and IS_DELETED = 'N'
+	    	<if test="userName != null and userName != ''" >
+	    	  and USER_NAME = #{userName}
+	    	</if>
+	    	<if test="id != null and id != ''" >
+	    	  and ID != #{id}
+	    	</if>
+    	</trim>
+    </select>
+    
+    <select id="selectByParameter" parameterType="java.util.Map" resultMap="AccountResultMap">
+        select
+			A.ID ID,
+			A.USER_NAME USERNAME,
+			A.ROLE_CODE ROLECODE,
+			U.REAL_NAME REALNAME,
+			D.DEPT_NAME DEPTNAME,
+			U.SEX SEX,
+			U.PHONE PHONE,
+			U.EMAIL EMAIL,
+			U.SUMMARY,
+			U.PAPERWORK_NO PAPERWORKNO,
+			A.CREATE_TIME CREATE_TIME,
+			A.TYPE,
+			A.USER_ID USERID
+		from
+			ACCOUNT A
+		left join USER_INFO U on A.USER_ID = U.ID and U.IS_DELETED = 'N'
+		left join USER_DEPT UD on UD.USER_ID = U.ID 
+		left join DEPARTMENT D on UD.DEPT_ID = D.ID and D.IS_DELETED = 'N'
+		where 
+			A.IS_DELETED = 'N'
+		<if test="userName != null and userName != '' ">
+		    and A.USER_NAME like '%${userName}%'
+	    </if>
+	    <if test="deptName != null and deptName != ''" >
+			and D.DEPT_NAME like '%${deptName}%' 
+		</if>
+		<if test="roleId != null and roleId != ''" >
+			and exists(select 1 from AUTH_USER_ROLE AUR where AUR.USER_ID = U.ID and AUR.ROLE_ID = #{roleId,jdbcType=VARCHAR})
+		</if>
+		<if test="realName != null and realName != ''">
+			and exists(select 1 from BASE_USER_VIEW where REAL_NAME like concat(concat('%',#{realName,jdbcType=VARCHAR}),'%') and ID = U.ID)
+		</if>
+		<if test="userId != null and userId != '' ">
+		    and A.USER_ID = #{userId,jdbcType=VARCHAR}
+		</if>
+    </select>
+</mapper>

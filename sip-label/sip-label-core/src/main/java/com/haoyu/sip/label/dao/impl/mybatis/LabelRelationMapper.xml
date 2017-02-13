@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.label.dao.impl.mybatis.LabelRelationMapper" >
+  <resultMap id="BaseResultMap" type="com.haoyu.sip.label.entity.LabelRelation" >
+    <result column="LEBAL_ID" property="lebalId" jdbcType="VARCHAR" />
+    <result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LEBAL_ID, RELATION_ID, TYPE
+  </sql>
+  <delete id="deleteByRelationId" parameterType="com.haoyu.sip.label.entity.LabelRelation" >
+    delete from LABEL_RELATION
+    where RELATION_ID = #{relationId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.haoyu.sip.label.entity.LabelRelation" >
+    insert into LABEL_RELATION (LEBAL_ID, RELATION_ID, TYPE)
+    values (#{lebalId,jdbcType=VARCHAR}, #{relationId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertByIds" parameterType="map">
+  	insert into LABEL_RELATION(LABEL_ID, RELATION_ID, TYPE)
+  	select ID, #{relationId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}
+  	from LABEL
+  	where ID in
+  	<foreach collection="ids" open="(" close=")" separator="," item="item"> 
+  		#{item}
+  	</foreach>
+  </insert>
+</mapper>

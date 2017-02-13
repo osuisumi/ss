@@ -1,0 +1,12 @@
+com\haoyu\sip\label\service\impl\LabelServiceImpl.class
+com\haoyu\sip\label\dao\impl\mybatis\LabelDao.class
+com\haoyu\base\entity\BaseEntity.class
+com\haoyu\sip\label\dao\ILabelDao.class
+com\haoyu\base\utils\BaseServiceUtils.class
+com\haoyu\sip\label\dao\ILabelRelationDao.class
+com\haoyu\sip\label\service\impl\LabelRelationServiceImpl.class
+com\haoyu\sip\label\entity\Label.class
+com\haoyu\sip\label\entity\LabelRelation.class
+com\haoyu\sip\label\dao\impl\mybatis\LabelRelationDao.class
+com\haoyu\sip\label\service\ILabelRelationService.class
+com\haoyu\sip\label\service\ILabelService.class

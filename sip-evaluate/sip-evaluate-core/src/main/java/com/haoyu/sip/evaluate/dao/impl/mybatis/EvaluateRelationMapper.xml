@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.evaluate.dao.impl.mybatis.EvaluateRelationMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.evaluate.entity.EvaluateRelation">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="RELATION_ID" jdbcType="VARCHAR" property="relation.id" />
+		<result column="TYPE" jdbcType="VARCHAR" property="type" />
+		<result column="SCORE" jdbcType="DECIMAL" property="score" />
+		<result column="SUBMIT_NUM" jdbcType="DECIMAL" property="submitNum" />
+		<result column="CREATOR" jdbcType="VARCHAR" property="creator.id" />
+		<result column="CREATE_TIME" jdbcType="DECIMAL" property="createTime" />
+		<result column="UPDATEDBY" jdbcType="VARCHAR" property="updatedby.id" />
+		<result column="UPDATE_TIME" jdbcType="DECIMAL" property="updateTime" />
+		<result column="VERSION" jdbcType="DECIMAL" property="version" />
+		<result column="IS_DELETED" jdbcType="CHAR" property="isDeleted" />
+		
+		<result column="EVALUATE_ID" jdbcType="VARCHAR" property="evaluate.id" />
+		<result column="TITLE" jdbcType="VARCHAR" property="evaluate.title" />
+		<result column="DESCRIPTION" jdbcType="VARCHAR" property="evaluate.description" />
+		<result column="STATE" jdbcType="VARCHAR" property="evaluate.state" />
+	</resultMap>
+	<sql id="BaseSelectSql">
+		select ER.ID, ER.EVALUATE_ID, ER.RELATION_ID, ER.TYPE, ER.SCORE, ER.SUBMIT_NUM, ER.CREATOR, ER.CREATE_TIME,
+		E.TITLE, E.DESCRIPTION, E.STATE
+		from EVALUATE_RELATION ER
+		join EVALUATE E
+		on E.ID = ER.EVALUATE_ID
+		and E.IS_DELETED = 'N'
+	</sql>
+	<sql id="BaseWhereSql">
+		<choose>
+			<when test="isDeleted != null and isDeleted != ''">
+				where ER.IS_DELETED = #{isDeleted}
+			</when>
+			<otherwise>
+				where ER.IS_DELETED = 'N'
+			</otherwise>
+		</choose>
+		<if test="relationId != null and relationId != ''">
+			and ER.RELATION_ID = #{relationId}
+		</if>
+	</sql>
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		<include refid="BaseSelectSql" />
+		<include refid="BaseWhereSql" />
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		<include refid="BaseSelectSql" />
+		where ER.ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.evaluate.entity.EvaluateRelation">
+		insert into EVALUATE_RELATION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="evaluate != null">
+				EVALUATE_ID,
+			</if>
+			<if test="relation != null">
+				RELATION_ID,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+			<if test="score != null">
+				SCORE,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="evaluate != null">
+				#{evaluate.id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation != null">
+				#{relation.id,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="score != null">
+				#{score,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.evaluate.entity.EvaluateRelation">
+		update EVALUATE_RELATION ER
+		<set>
+			<if test="evaluate != null">
+				EVALUATE_ID = #{evaluate.id,jdbcType=VARCHAR},
+			</if>
+			<if test="relation != null">
+				RELATION_ID = #{relation.id,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				TYPE = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="score != null">
+				SCORE = (select avg(SCORE) from EVALUATE_SUBMISSION where EVALUATE_RELATION_ID = ER.ID and state = 'submited' and IS_DELETED = 'N'),
+			</if>
+			<if test="submitNum != null and submitNum > 0">
+				SUBMIT_NUM = (select count(ID) from EVALUATE_SUBMISSION where EVALUATE_RELATION_ID = ER.ID and state = 'submited' and IS_DELETED = 'N'),
+			</if>
+			<!-- 
+			<if test="creator != null">
+				CREATOR = #{creator.id,jdbcType=VARCHAR},
+			</if>
+			 -->
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=DECIMAL},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=DECIMAL},
+			</if>
+			<if test="version != null">
+				VERSION = #{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="map">
+		update EVALUATE_RELATION
+		set IS_DELETED = 'Y', UPDATE_TIME = #{entity.updateTime, jdbcType=TIMESTAMP}
+		<if test="entity.updatedby != null and entity.updatedby.id != null and entity.updatedby.id != ''">
+			,UPDATEDBY = #{entity.updatedby.id, jdbcType=VARCHAR}
+		</if>
+		where ID in
+		<foreach collection="ids" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

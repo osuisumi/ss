@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.file.dao.impl.mybatis.FileInfoMapper" >
+  <resultMap id="FileInfoMap" type="com.haoyu.sip.file.entity.FileInfo" >
+  	<id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="FILE_SIZE" property="fileSize" jdbcType="DECIMAL" />
+    <result column="GROUP_NAME" property="groupName" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="FILE_RESOURCE_ID" property="fileResource.id" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+    <result column="REAL_NAME" property="creator.realName" jdbcType="VARCHAR" />
+    <result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+    <collection property="fileRelations" ofType="com.haoyu.sip.file.entity.FileRelation">
+	    <id property="id" column="FILE_RELATION_ID" />
+	    <result property="downloadNum" column="DOWNLOAD_NUM" jdbcType="DECIMAL"/>
+	    <result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR" />
+	    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+	</collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID,FILE_NAME,STATE,FILE_SIZE,URL,GROUP_NAME,REMARK,FILE_RESOURCE_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="FileInfoMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FILE_INFO
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.file.entity.FileInfo" >
+    insert into FILE_INFO(ID,FILE_NAME,STATE,FILE_SIZE,URL,GROUP_NAME,FILE_RESOURCE_ID,REMARK,
+       CREATOR, CREATE_TIME, UPDATEDBY, UPDATE_TIME, IS_DELETED, VERSION
+      )
+    values(#{id,jdbcType=VARCHAR},#{fileName,jdbcType=VARCHAR},#{state,jdbcType=VARCHAR},#{fileSize,jdbcType=INTEGER},
+    #{url,jdbcType=VARCHAR},#{groupName,jdbcType=VARCHAR},#{fileResource.id,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR},
+    #{creator.id,jdbcType=VARCHAR}, #{createTime,jdbcType=INTEGER}, #{updatedby.id,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=INTEGER}, #{isDeleted,jdbcType=CHAR}, #{version,jdbcType=INTEGER}
+    )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.file.entity.FileInfo" >
+    update FILE_INFO
+    <set >
+      <if test="fileName != null" >
+        FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null" >
+        IS_DELETED = #{isDeleted,jdbcType=CHAR},
+      </if>
+    </set>
+    ,VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="select" parameterType="map" resultMap="FileInfoMap">
+  	select 
+  	FI.ID,FI.FILE_NAME,FI.STATE,FI.FILE_SIZE,FI.URL,FI.GROUP_NAME,FI.REMARK,FI.FILE_RESOURCE_ID, FI.CREATE_TIME, FI.CREATOR,
+  	(select BUV.REAL_NAME from BASE_USER_VIEW BUV where BUV.ID = FI.CREATOR) REAL_NAME
+  	<if test="relationId != null and relationId != ''">
+  		,FR.ID FILE_RELATION_ID, FR.DOWNLOAD_NUM, FR.RELATION_ID, FR.TYPE
+  	</if>
+    from FILE_INFO FI
+    <if test="relationId != null and relationId != ''">
+    	join FILE_RELATION FR
+    	on FR.FILE_ID = FI.ID
+    	and FR.IS_DELETED = 'N'
+    	and FR.RELATION_ID = #{relationId}
+    	<if test="type != null and type != ''">
+    		and FR.TYPE = #{type}
+    	</if>
+    </if>
+    where FI.IS_DELETED = 'N'
+    <if test="fileResourceId != null and fileResourceId != ''">
+    	and FI.FILE_RESOURCE_ID = #{fileResourceId}
+    </if>
+  </select>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.file.entity.FileResource">
+  	update FILE_INFO
+  	set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime, jdbcType=INTEGER}
+  	<if test="updatedby != null and updatedby != ''">
+  		,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+  	</if>
+  	where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="getCount" parameterType="map" resultType="int">
+  	select count(FI.ID)
+  	from FILE_INFO FI
+  	join FILE_RELATION FR
+  	on FI.ID = FR.FILE_ID
+  	and FR.IS_DELETED = 'N'
+  	where FI.IS_DELETED = 'N'
+  	<if test="relationId != null and relationId != ''">
+  		and FR.RELATION_ID = #{relationId}
+  	</if>
+  	<if test="ceator != null and ceator != ''">
+  		and FI.CREATOR = #{ceator}
+  	</if>
+  </select>
+</mapper>

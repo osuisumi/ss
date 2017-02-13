@@ -1,0 +1,244 @@
+/*
+ * jQuery Booklet Plugin
+ * Copyright (c) 2010 - 2012 W. Grauvogel (http://builtbywill.com/)
+ *
+ * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+ * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+ *
+ * Version : 1.4.0
+ *
+ * Originally based on the work of:
+ *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
+ */
+
+    body {
+        background: url(images/bg.jpg) left top repeat-x;
+        line-height: 22px;
+        font-size: 12px;
+        font-family: "\5FAE\8F6F\96C5\9ED1";
+        color: #646464;
+    }
+    .g-auto {
+        margin: 0 auto;
+        width: 1000px;
+    }
+    #g-ft {
+        height: 140px;
+        background-color: #474747;
+        color: #a7a7a7; 
+    }
+
+    .m-ft-nav {
+        display: inline-block;
+        *display: inline;
+        float: left;
+        padding-top: 51px; 
+    }
+    .m-ft-nav li {
+        display: inline-block;
+        *display: inline;
+        float: left;
+        margin-right: 40px; 
+    }
+    .m-ft-nav .item1 dl {
+        background-position: 0 0px; 
+    }
+    .m-ft-nav .item2 dl {
+        background-position: 0 -36px; 
+    }
+    .m-ft-nav .item3 dl {
+        background-position: 0 -72px; 
+    }
+    .m-ft-nav dl {
+        padding-left: 46px;
+        line-height: 18px;
+        background: url(images/footer-ico.png) no-repeat; 
+    }
+    .m-ft-nav dt {
+        font-weight: 700; 
+    }
+    .m-ft-nav .item4 a {
+        line-height: 53px;
+        color: #a7a7a7; 
+    }
+    .m-ft-nav .item4 a:hover {
+        color: #1d86f0; 
+    }
+
+    .m-ft-info {
+        padding-top: 30px; 
+    }
+    .m-ft-info, .m-ft-info .info, .m-ft-info .tdc {
+        display: inline-block;
+        *display: inline;
+        float: right; 
+    }
+    .m-ft-info .info {
+        padding: 6px 12px 0 0;
+        text-align: right; 
+    }
+    #footer {
+        width: 1200px;
+        margin: 0 auto;
+        background: #e8e8e8 url(images/footer.jpg) right top no-repeat;
+        border-top: 1px solid #fff;
+        height: 45px;
+        padding-top: 14px;
+        line-height: 180%;
+        text-align: center;
+    }
+    
+    .myBookWrap {
+        position: relative;
+        padding-top: 20px;
+        margin: 0 auto 20px auto;
+        width: 1200px;
+    }
+    /* .myBookBox {
+        position: relative;
+        padding-top: 20px;
+        
+    } */
+    .myBookBox:hover .b-menu {
+        opacity: 1;
+        filter: alpha(opacity = 100);
+
+    }
+    
+    .myBookOpa {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        z-index: 100;
+        margin-left: -111px;
+        width: 222px;
+        height: 50px;
+        background: url(images/mybook-optBg.png) no-repeat;
+    }
+    .myBookOpa .custom-prev, .myBookOpa .custom-next {
+        display: block;
+        position: absolute;
+        top: 0;
+        width: 55px;
+        height: 50px;
+        background: url(images/mybook-opt.png) no-repeat;
+    }
+    .myBookOpa .custom-prev {
+        left: 0;
+        background-position: left top;
+    }
+    .myBookOpa .custom-prev:hover {
+        background-position: left bottom;
+    }
+    .myBookOpa .custom-next {
+        right: 0;
+        background-position: right top;
+    }
+    .myBookOpa .custom-next:hover {
+        background-position: right bottom;
+    }
+
+
+	.booklet         {width:1200px; height:820px; position:relative; margin:0 auto 10px; background-color: #fff; border: 1px solid #94B6E7; overflow:visible !important;}
+	.booklet .b-page {left:0; top:0; position:absolute; overflow:hidden; padding:0;}
+	
+	.booklet .b-pN  {}
+	.booklet .b-p0  {}
+	.booklet .b-p1  {}
+	.booklet .b-p2  {}    
+	.booklet .b-p3  {}
+	.booklet .b-p4  {}
+	   
+   	/* Page Wrappers */
+	.booklet .b-wrap       {top:0; position:absolute;}
+	.booklet .b-wrap-left  {background:#fff;}
+	.booklet .b-wrap-right {background:#efefef;}
+	
+    .booklet .b-wrap img {
+        width: 100%;
+        height: 800px;
+    }
+
+	.booklet .b-pN .b-wrap,
+	.booklet .b-p1 .b-wrap,
+	.booklet .b-p2 .b-wrap,
+	.booklet .b-p3 .b-wrap,
+	.booklet .b-p4 .b-wrap  {left:0;}
+	.booklet .b-p0 .b-wrap  {right:0;}
+	
+   	/* Custom Page Types */
+	.booklet .b-page-blank  {padding:0; width:100%; height:100%;}
+	.booklet .b-page-cover  {padding:0; width:100%; height:100%; background:#925C0E;}
+	.booklet .b-page-cover h3  {color:#fff; text-shadow:0px 1px 3px #222;}
+   
+   	/* Page Numbers */
+	.booklet .b-counter { bottom:10px; position:absolute; display:block; width:25px; height:20px; background:#ccc; color:#444; text-align:center; font-family:Georgia, "Times New Roman", Times, serif; font-size:10px; padding:5px 0 0;}
+	.booklet .b-wrap-left  .b-counter  {left:10px;}
+	.booklet .b-wrap-right .b-counter {right:10px;}
+   
+   	/* Page Shadows */
+	.booklet .b-shadow-f  {right:0; top:0; position:absolute; opacity:0; background-image:url("images/shadow-top-forward.png"); background-repeat:repeat-y; background-position:100% 0;}
+	.booklet .b-shadow-b  {left:0;  top:0; position:absolute; opacity:0; background-image:url("images/shadow-top-back.png");    background-repeat:repeat-y; background-position:0 0;}
+	
+	.booklet .b-p0 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:100% 10px;}
+	.booklet .b-p3 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:0 10px;}
+	
+   	/* Overlay Controls */
+	.booklet .b-grab     {cursor: url("images/openhand.cur"), default;}
+	.booklet .b-grabbing {cursor: url("images/closedhand.cur"), default;}
+	
+   	/* Overlay Controls */
+	.booklet .b-overlay      {top:0; position:absolute; height:100%; width:50%;}
+	.booklet .b-overlay-prev {left:0;}
+	.booklet .b-overlay-next {right:0;}
+	
+   	/* Tab Controls */
+	.booklet .b-tab        {background:#000; height:40px; width:100%; padding:10px 0 0; text-align:center; color:#ccc; position:absolute; font-size:11px;}
+	.booklet .b-tab-prev   {left:0;}
+	.booklet .b-tab-next   {right:0;}
+	.booklet .b-tab:hover  {background:#aaa; color:#000;}	
+	
+   	/* Arrow Controls */
+	.booklet .b-arrow          {display:block; position:absolute; text-indent:-9999px; top:0; height:100%; width:74px;}
+	.booklet .b-arrow div      {display:none; text-indent:-9999px; height:170px; width:74px; position:absolute; left:0; top:25%;}
+	.booklet .b-arrow-next     {right:-80px;}
+	.booklet .b-arrow-prev     {left:-80px;}
+	.booklet .b-arrow-next div {background:url("images/arrow-next.png") no-repeat left top;}
+	.booklet .b-arrow-prev div {background:url("images/arrow-prev.png") no-repeat left top;}
+		
+/* @z-index fix (needed for older IE browsers)
+----------------------------------------*/
+
+    body              {z-index:0;}
+    .b-menu           {z-index:100;}
+    .b-selector       {z-index:100;}
+    .booklet          {z-index:10;}
+    .b-pN             {z-index:10;}
+    .b-p0             {z-index:30;}
+    .b-p1             {z-index:20;}
+    .b-p2             {z-index:20;}
+    .b-p3             {z-index:30;}
+    .b-p4             {z-index:10;}
+    .b-prev           {z-index:40;}
+    .b-next           {z-index:40;}
+    .b-counter        {z-index:40;}
+	
+/* @Menu Items
+----------------------------------------*/
+	.b-menu {display: block; margin-left: -41px; position: absolute; left: 50%; top: 10px; width: 82px; height:30px; /* opacity: 0;
+        filter: alpha(opacity = 0); */}
+	
+	.b-selector             {display: inline-block; height:30px; position:relative; border:none; cursor:pointer; font:normal 12px "Myriad Pro", Myriad, "DejaVu Sans Condensed","Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;}
+	.b-selector .b-current  {padding:5px 20px 5px 0; position: absolute; top: 0; left: 0; line-height:20px; width: 62px; height:20px; font-size: 14px; display:inline-block; background: url(images/currentBg.png) left top no-repeat;  text-align:center; color: #171616;}
+	.b-selector-page        {width: 82px;}
+	.b-selector-chapter     {width:auto;}
+	
+	.b-selector ul               {overflow:hidden; margin:0;  font-size: 14px; list-style:none !important; position:absolute; top:29px; right:0; padding:0; background:#e5e5e5; background-color: rgba(229,229,229,0.9);  width:81px;}
+	.b-selector li               {border:none; padding-left: 10px; height: 24px;}
+    .b-selector li:hover         { background-color: #ccc;}
+	.b-selector a                {color:#171616; height:14px; line-height: 14px; text-decoration:none; display:block; padding:5px 10px;}
+	.b-selector a .b-text        {float:left; clear:none;}
+	.b-selector a .b-num         {float:left; clear:none;}
+	.b-selector a:hover          {color:#000;}
+		

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.file.dao.impl.mybatis.FileResourceMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.file.entity.FileResource">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+		<result column="PARENT_IDS" property="parentIds" jdbcType="VARCHAR" />
+		<result column="IS_FOLDER" property="isFolder" jdbcType="CHAR" />
+		<result column="FILE_COUNT" property="fileCount" jdbcType="INTEGER" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="REAL_NAME" property="creator.realName" jdbcType="VARCHAR" />
+		<result column="FILE_INFO_ID" property="newestFile.id" jdbcType="VARCHAR" />
+		<result column="URL" property="newestFile.url" jdbcType="VARCHAR" />
+		<result column="FILE_NAME" property="newestFile.fileName" jdbcType="VARCHAR"/>
+		<result column="FILE_SIZE" property="newestFile.fileSize" jdbcType="DECIMAL" />
+		<collection property="fileRelations" javaType="com.haoyu.sip.file.entity.FileRelation">
+			<id column="FILE_RELATION_ID" property="id" jdbcType="VARCHAR" />
+			<result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR"/>
+			<result column="FILE_RELATION_TYPE" property="type" jdbcType="VARCHAR"/>
+			<result column="FILE_RELATION_TYPE" property="relation.type" jdbcType="VARCHAR"/>
+		</collection>
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, NAME, PARENT_ID, PARENT_IDS, FILE_INFO_ID, IS_FOLDER, FILE_COUNT, CREATOR, CREATE_TIME
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select FR.ID, FR.NAME, FR.PARENT_ID, FR.PARENT_IDS, FR.CREATOR, FR.CREATE_TIME, FR.IS_FOLDER,FR.FILE_INFO_ID,FR.TYPE
+		,FRR.ID FILE_RELATION_ID,FRR.RELATION_ID RELATION_ID,FRR.TYPE FILE_RELATION_TYPE
+		from FILE_RESOURCE FR join FILE_RELATION FRR
+		on FRR.FILE_ID = FR.ID
+		where FR.ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		select FR.ID, FR.NAME, FR.PARENT_ID, FR.PARENT_IDS, FR.CREATOR, FR.CREATE_TIME, FR.IS_FOLDER,FR.FILE_INFO_ID,FR.TYPE,
+		BUV.REAL_NAME,
+		FI.URL,
+		FI.FILE_NAME,FI.FILE_SIZE,
+		(select count(ID) from FILE_RESOURCE FR1 where IS_DELETED = 'N' and IS_FOLDER = 'N' and PARENT_IDS like concat('%',concat(FR.ID,'%')) 
+		and exists (select 1 from FILE_RELATION where FILE_ID = FR1.ID and IS_DELETED = 'N' and RELATION_ID = #{relationId})
+		) FILE_COUNT
+		<if test="relationId != null and relationId != ''">
+			,FRR.ID FILE_RELATION_ID,FRR.RELATION_ID RELATION_ID,FRR.TYPE FILE_RELATION_TYPE
+		</if>
+		from FILE_RESOURCE FR
+		<if test="relationId != null and relationId != ''">
+			join FILE_RELATION FRR
+			on FRR.FILE_ID = FR.ID
+			and FRR.IS_DELETED = 'N'
+			and FRR.RELATION_ID = #{relationId}
+		</if>
+		join BASE_USER_VIEW BUV
+		on BUV.ID = FR.CREATOR
+		left join FILE_INFO FI
+		on FI.ID = FR.FILE_INFO_ID
+		where FR.IS_DELETED = 'N'
+		<choose>
+			<when test="parentId != null and parentId != ''">
+				and FR.PARENT_ID = #{parentId, jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				and (FR.PARENT_ID is null or FR.PARENT_ID = '')
+			</otherwise>
+		</choose>
+		<if test="creator != null and creator != ''">
+			and FR.CREATOR = #{creator, jdbcType=VARCHAR}
+		</if>
+		<if test="keyWord != null and keyWord != ''">
+			and (FR.NAME like '%${keyWord}%'
+			or exists (select 1 from BASE_USER_VIEW VU
+			where VU.ID = FR.CREATOR
+			and VU.REAL_NAME like '%${keyWord}%'))
+		</if>
+		<if test="isFolder != null and isFolder != ''">
+			and FR.IS_FOLDER = #{isFolder, jdbcType=VARCHAR}
+		</if>
+		<if test="type != null and type != ''">
+			and FR.TYPE = #{type,jdbcType=VARCHAR}
+		</if>
+		<if test="parentIds != null and parentIds != ''">
+			and FR.PARENT_IDS like concat(concat('%',#{parentIds,jdbcType=VARCHAR}),'%')
+		</if>
+		order by FR.IS_FOLDER DESC, FR.CREATE_TIME
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from FILE_RESOURCE
+		where ID = #{id,jdbcType=VARCHAR}
+	</delete>
+	<insert id="insert" parameterType="com.haoyu.sip.file.entity.FileResource">
+		insert into FILE_RESOURCE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="parentId != null">
+				PARENT_ID,
+			</if>
+				PARENT_IDS,
+			<if test="newestFile != null">
+				FILE_INFO_ID,
+			</if>
+			<if test="isFolder != null">
+				IS_FOLDER,
+			</if>
+			<if test="fileCount != null">
+				FILE_COUNT,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				#{parentId,jdbcType=VARCHAR},
+			</if>
+			<choose>
+				<when test="parentId != null and parentId != ''">
+					(select concat(PARENT_IDS, concat(',', #{parentId,jdbcType=VARCHAR})) from (select * from FILE_RESOURCE where ID = #{parentId,jdbcType=VARCHAR}) T),
+				</when>
+				<otherwise>
+					'',
+				</otherwise>
+			</choose>
+			<if test="newestFile != null">
+				#{newestFile.id,jdbcType=VARCHAR},
+			</if>
+			<if test="isFolder != null">
+				#{isFolder,jdbcType=VARCHAR},
+			</if>
+			<if test="fileCount != null">
+				#{fileCount,jdbcType=DECIMAL},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=INTEGER},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.file.entity.FileResource">
+		update FILE_RESOURCE FR
+		<set>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				<choose>
+					<when test="parentId == 'null'">
+						PARENT_ID = '',
+						PARENT_IDS = '',
+					</when>
+					<otherwise>
+						PARENT_ID = #{parentId,jdbcType=VARCHAR},
+						PARENT_IDS = (select PARENT_IDS ||','||#{parentId,jdbcType=VARCHAR} from FILE_RESOURCE where ID = #{parentId,jdbcType=VARCHAR}),
+					</otherwise>
+				</choose>
+			</if>
+			<if test="newestFile != null">
+				FILE_INFO_ID = #{newestFile.id,jdbcType=VARCHAR},
+			</if>
+			<if test="isFolder != null">
+				IS_FOLDER = #{isFolder,jdbcType=VARCHAR},
+			</if>
+			<if test="fileCount != null and fileCount > 0">
+				FILE_COUNT = (select FILE_COUNT from (select count(ID) FILE_COUNT from FILE_RESOURCE where IS_DELETED = 'N' and PARENT_ID = #{id,jdbcType=VARCHAR} and IS_FOLDER = 'N') TMP),
+			</if>
+			<if test="type != null and type != ''">
+				TYPE = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null and updateTime > 0">
+				UPDATE_TIME = #{updateTime,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+		</set>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.file.entity.FileResource">
+		update FILE_RESOURCE
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime, jdbcType=INTEGER}
+		<if test="updatedby != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+		</if>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateChildFileParent" parameterType="com.haoyu.sip.file.entity.FileResource">
+		update FILE_RESOURCE FR
+		set PARENT_IDS = (select PARENT_IDS ||','||#{id,jdbcType=VARCHAR} from FILE_RESOURCE where ID = #{id,jdbcType=VARCHAR})
+		, UPDATE_TIME = #{updateTime, jdbcType=INTEGER}
+		<if test="updatedby != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+		</if>
+		where IS_DELETED = 'N'
+		and PARENT_ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<select id="getCount" parameterType="map" resultType="int">
+		select count(FR.ID)
+		from FILE_RESOURCE FR
+		where FR.IS_DELETED = 'N'
+		<if test="isFolder != null and isFolder != ''">
+			and IS_FOLDER = #{isFolder}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			and exists (SELECT 1 FROM FILE_RELATION where IS_DELETED = 'N' and FILE_ID = FR.ID and RELATION_ID = #{relationId})
+		</if>
+		<if test="creator != null and creator != ''">
+			and CREATOR = #{creator}
+		</if>
+	</select>
+</mapper>

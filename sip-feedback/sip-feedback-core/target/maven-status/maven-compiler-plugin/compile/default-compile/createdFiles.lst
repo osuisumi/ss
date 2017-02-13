@@ -1,0 +1,5 @@
+com\haoyu\sip\feedback\dao\IFeedbackDao.class
+com\haoyu\sip\feedback\entity\Feedback.class
+com\haoyu\sip\feedback\service\IFeedbackService.class
+com\haoyu\sip\feedback\dao\impl\mybatis\FeedbackDao.class
+com\haoyu\sip\feedback\service\impl\FeedbackServiceImpl.class

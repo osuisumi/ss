@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.theme.dao.impl.mybatis.VisualThemeMapper" >
+  <resultMap id="VisualThemeResultMap" type="com.haoyu.sip.theme.entity.VisualTheme" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="RESOURCE_DIR" property="resourceDir" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <association property="visualThemeSet" javaType="com.haoyu.sip.theme.entity.VisualThemeSet">
+    	<id column="VISUAL_THEME_SET_ID" property="id" jdbcType="VARCHAR" />
+    	<result column="VISUAL_THEME_SET_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    VT.ID,VT.NAME,VT.RESOURCE_DIR,VT.DESCRIPTION,VT.VISUAL_THEME_SET_ID,VTS.NAME VISUAL_THEME_SET_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="VisualThemeResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from VISUAL_THEME VT
+    join VISUAL_THEME_SET VTS
+    on VT.VISUAL_THEME_SET_ID=VTS.ID
+    where VT.IS_DELETED='N'
+    and VT.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="VisualThemeResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from VISUAL_THEME VT
+    join VISUAL_THEME_SET VTS
+    on VT.VISUAL_THEME_SET_ID=VTS.ID
+    where VT.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	and VT.NAME LIKE CONCAT('%',#{name,jdbcType=VARCHAR},'%' )  
+    </if>
+    <if test="visualThemeSetId!=null and visualThemeSetId!=''">
+    	and VT.VISUAL_THEME_SET_ID=#{visualThemeSetId,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.theme.entity.VisualTheme">
+  	insert into VISUAL_THEME(ID,NAME,RESOURCE_DIR,DESCRIPTION,VISUAL_THEME_SET_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{resourceDir,jdbcType=VARCHAR},#{description,jdbcType=VARCHAR},#{visualThemeSet.id,jdbcType=VARCHAR},
+  	#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.theme.entity.VisualTheme">
+  	update VISUAL_THEME
+  	<set >
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceDir != null and resourceDir!=''" >
+        RESOURCE_DIR = #{resourceDir,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null and description!=''" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete VISUAL_THEME
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.theme.entity.VisualTheme">
+  	  update VISUAL_THEME
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		VISUAL_THEME_SET_ID=#{visualThemeSet.id,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.attitude.dao.impl.mybatis.AttitudeUserMapper" >
+  <resultMap type="com.haoyu.sip.attitude.entity.AttitudeUser" id="AttitudeUserResultMap">
+  	<id property="id" column="ID" jdbcType="VARCHAR"/>
+  	<result property="attitude" column="ATTITUDE" jdbcType="VARCHAR"/>
+  	<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+	    	<id property="id" column="USER_ID"/>
+	    	<result property="realName" column="REAL_NAME"/>
+	    	<result property="avatar" column="AVATAR"/>
+	</association>
+	<association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+  		<id property="id" column="RELATION_ID"/>
+  		<result property="type" column="RELATION_TYPE"/>
+  	</association>
+  </resultMap>
+  <resultMap type="com.haoyu.sip.attitude.entity.AttitudeStat" id="AttitudeStatResultMap">
+  	<result property="attitude" column="ATTITUDE" jdbcType="VARCHAR"/>
+  	<result property="participateNum" column="PARTICIPATE_NUM" jdbcType="INTEGER"/>  
+  	<result property="relation.id" column="RELATION_ID"/>
+  	<result property="relation.type" column="RELATION_TYPE"/>
+  </resultMap>
+  <sql id="AttitudeUserColumn">
+  	AU.ID,AU.ATTITUDE,AU.RELATION_ID,AU.RELATION_TYPE
+  	,BUV.ID USER_ID,BUV.REAL_NAME,BUV.AVATAR
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="AttitudeUserResultMap">
+  	select <include refid="AttitudeUserColumn"/>
+  	from ATTITUDE_USER AU
+  	join BASE_USER_VIEW BUV on BUV.ID = AU.CREATOR
+  	where AU.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByAttitudeUser"  parameterType="com.haoyu.sip.attitude.entity.AttitudeUser" resultMap="AttitudeUserResultMap">
+  	select <include refid="AttitudeUserColumn"/>
+  	from ATTITUDE_USER AU
+  	join BASE_USER_VIEW BUV on BUV.ID = AU.CREATOR
+  	where AU.IS_DELETED='N'
+  	<if test="attitude!=null and attitude!=''">
+  		AND AU.ATTITUDE=#{attitude,jdbcType=VARCHAR}
+  	</if>
+  	<if test="relation!=null and relation.id!=null">
+  		AND AU.RELATION_ID=#{relation.id,jdbcType=VARCHAR}
+  	</if>
+  	<if test="relation!=null and relation.type!=null">
+  		AND AU.RELATION_TYPE=#{relation.type,jdbcType=VARCHAR}
+  	</if>
+  	<if test="creator!=null and creator.id!=null">
+  		AND AU.CREATOR=#{creator.id,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  <select id="selectAttitudeStatByAttitudeAndRelation" parameterType="com.haoyu.sip.attitude.entity.AttitudeUser" resultMap="AttitudeStatResultMap">
+  	select ATTITUDE,COUNT(AU.ID) PARTICIPATE_NUM
+  	from ATTITUDE_USER AU
+  	where AU.IS_DELETED='N'
+  	and AU.RELATION_ID=#{relation.id,jdbcType=VARCHAR}
+  	<if test="attitude!=null and attitude!=''">
+  		AND AU.ATTITUDE=#{attitude,jdbcType=VARCHAR}
+  	</if>
+  	GROUP BY ATTITUDE
+  </select>
+  <select id="selectByParameter" parameterType="map" resultMap="AttitudeUserResultMap">
+	select
+	<include refid="AttitudeUserColumn" />
+	from ATTITUDE_USER AU
+	join BASE_USER_VIEW BUV on BUV.ID = AU.CREATOR
+	where AU.IS_DELETED = 'N'
+	<if test="relationIds != null">
+		and AU.RELATION_ID in
+		<foreach collection="relationIds" open="(" close=")" item="relationId" separator=",">
+			#{relationId,jdbcType=VARCHAR}
+		</foreach>
+	</if>
+	<if test="creatorId != null and creatorId != ''">
+		and CREATOR = #{creatorId,jdbcType=VARCHAR}
+	</if>
+	<if test="relationType != null and relationType != ''">
+		and RELATION_TYPE = #{relationType,jdbcType=VARCHAR}
+	</if>
+	<if test="attitude != null and attitude != ''">
+		and ATTITUDE = #{attitude,jdbcType=VARCHAR}
+	</if>
+  </select>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.attitude.entity.AttitudeUser">
+  	update ATTITUDE_USER 
+  	set IS_DELETED='Y'
+  	,UPDATE_TIME=#{updateTime,jdbcType=BIGINT}
+  	<if test="updatedby!=null and updatedby.id!=null">
+  		,UPDATED_BY=#{updatedby,jdbcType=VARCHAR}
+  	</if>
+  	,VERSION =VERSION+1
+  	where 
+  	<choose>
+  		<when test="id!=null and id!=''">
+  			AND ID=#{id,jdbcType=VARCHAR}
+  		</when>
+  		<otherwise>
+  			RELATION_ID=#{relation.id,jdbcType=VARCHAR}
+		  	<if test="relation.type!=null and relation.type!=''">
+		  		AND RELATION_TYPE=#{relation.type,jdbcType=VARCHAR}
+		  	</if>
+		  	<if test="attitude!=null and attitude!=''">
+		  		AND ATTITUDE=#{attitude,jdbcType=VARCHAR}
+		  	</if>
+		  	<if test="creator!=null and creator.id!=null">
+		  		AND CREATOR=#{creator.id,jdbcType=VARCAHR}
+		  	</if>
+  		</otherwise>
+  	</choose>
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String" >
+    delete from ATTITUDE_USER
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.haoyu.sip.attitude.entity.AttitudeUser" >
+    insert into ATTITUDE_USER (ID, ATTITUDE,RELATION_ID, RELATION_TYPE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+    values (#{id,jdbcType=VARCHAR},#{attitude,jdbcType=VARCHAR}, #{relation.id,jdbcType=VARCHAR}, #{relation.type,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},
+  	#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey">
+  	update ATTITUDE_USER
+  	set ATTITUDE=#{attitude,jdbcType=VARCHAR}
+  	,UPDATE_TIME=#{updateTime,jdbcType=BIGINT}
+  	<if test="updatedby!=null and updatedby.id!=null">
+  		,UPDATED_BY=#{updatedby,jdbcType=VARCHAR}
+  	</if>
+  	,VERSION =VERSION+1
+  	WHERE ID=#{id,jdbcType=VARCHAR}
+  </update>
+  
+	<select id="selectAttitudeStat" parameterType="map" resultMap="AttitudeStatResultMap">
+		select
+			ATTITUDE,
+			RELATION_ID,
+			COUNT(AU.ID) PARTICIPATE_NUM
+		from
+			ATTITUDE_USER AU
+		where
+			AU.IS_DELETED = 'N'
+			and AU.RELATION_ID in 
+			<foreach collection="relationIds" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+			<if test="attitude != null and attitude != ''">
+			 	and AU.ATTITUDE = #{attitude,jdbcType=VARCHAR}
+			</if>
+		group by
+			ATTITUDE,
+			RELATION_ID
+	</select>
+	
+	<select id="selectAttitudeStatByParam" parameterType="map" resultMap="AttitudeStatResultMap">
+	  	select
+			AU.RELATION_ID RELATION_ID,
+			COUNT(AU.ID) PARTICIPATE_NUM
+		from
+			ATTITUDE_USER AU
+		where
+			AU.IS_DELETED = 'N'
+		<if test="relationIds != null and relationIds.size > 0" >
+			and AU.RELATION_ID in
+			<foreach collection="relationIds" open="(" close=")" separator="," item="relationId">
+				#{relationId}
+			</foreach>
+	 	</if>
+	  	<if test="attitude != null and attitude != '' ">
+	  		AND AU.ATTITUDE=#{attitude,jdbcType=VARCHAR}
+	  	</if>
+	  	GROUP BY RELATION_ID
+	</select>
+</mapper>

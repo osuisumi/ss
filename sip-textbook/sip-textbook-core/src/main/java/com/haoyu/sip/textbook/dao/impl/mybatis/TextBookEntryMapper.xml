@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.textbook.dao.impl.mybatis.TextBookEntryMapper">
+	<resultMap type="com.haoyu.sip.textbook.entity.TextBookEntry" id="textBookEntryResultMap">
+		<id column="ID" property="id" />
+		<result column="TEXT_BOOK_TYPE_CODE" property="textBookTypeCode" jdbcType="VARCHAR" />
+		<result column="TEXT_BOOK_VALUE" property="textBookValue" jdbcType="VARCHAR" />
+		<result column="TEXT_BOOK_NAME" property="textBookName" jdbcType="TIMESTAMP" />
+		<result column="PARENT_VALUE" property="parentValue" jdbcType="VARCHAR" />
+		<result column="PARENT_NAME" property="parentName" jdbcType="VARCHAR" />
+		<result column="RANK" property="rank" jdbcType="VARCHAR" />
+		<result column="SORT_NO" property="sortNo" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="INTEGER" />
+		<result column="UPDATEBY" property="updateBy" jdbcType="VARCHAR" />
+		<result column="IS_DELETED" property="isDeleted" jdbcType="CHAR" />
+		<result column="VERSION" property="version" jdbcType="DECIMAL" />
+		<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+			<id property="id" column="CREATOR_ID" />
+			<result property="realName" column="CREATOR_REAL_NAME" />
+		</association>
+	</resultMap>
+
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="textBookEntryResultMap">
+		select
+		TBE.ID,TBE.TEXT_BOOK_TYPE_CODE,TBE.TEXT_BOOK_VALUE,TBE.TEXT_BOOK_NAME,TBE.PARENT_VALUE,TBE.PARENT_NAME
+		from TEXT_BOOK_ENTRY TBE
+		where TBE.IS_DELETED = 'N'
+		and TBE.ID=#{id,jdbcType=VARCHAR}
+	</select>
+
+	<select id="select" parameterType="com.haoyu.sip.textbook.entity.TextBookEntry" resultMap="textBookEntryResultMap">
+		select
+		TBE.ID,TBE.TEXT_BOOK_TYPE_CODE,TBE.TEXT_BOOK_VALUE,TBE.TEXT_BOOK_NAME,TBE.PARENT_VALUE,TBE.PARENT_NAME,TBE.SORT_NO
+		from TEXT_BOOK_ENTRY TBE
+		where TBE.IS_DELETED = 'N'
+		<if test="textBookTypeCode!=null">
+			and TBE.TEXT_BOOK_TYPE_CODE = #{textBookTypeCode}
+		</if>
+		<if test="textBookValue!=null">
+			and TBE.TEXT_BOOK_VALUE = #{textBookValue}
+		</if>
+		<if test="textBookName!=null">
+			and TBE.TEXT_BOOK_NAME = #{textBookName}
+		</if>
+	</select>
+
+	<select id="getMaxValue" parameterType="com.haoyu.sip.textbook.entity.TextBookEntry" resultType="INTEGER">
+		select count(ID) from TEXT_BOOK_ENTRY TBE 
+		where TBE.TEXT_BOOK_TYPE_CODE=#{textBookTypeCode,jdbcType=VARCHAR}
+		<if test="parentValue!=null">
+			and TBE.PARENT_VALUE = #{parentValue}
+		</if>
+	</select>
+
+
+
+	<update id="deleteByLogic" parameterType="java.lang.String">
+		update TEXT_BOOK_ENTRY TBE
+		set TBE.IS_DELETED = 'Y'
+		where TBE.ID=#{id,jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteByPhysics" parameterType="java.lang.String">
+		delete from TEXT_BOOK_ENTRY TBE
+		where TBE.ID=#{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.haoyu.sip.textbook.entity.TextBookEntry">
+		insert into TEXT_BOOK_ENTRY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				ID,
+			</if>
+			<if test="textBookTypeCode!=null">
+				TEXT_BOOK_TYPE_CODE,
+			</if>
+			<if test="textBookValue!=null">
+				TEXT_BOOK_VALUE,
+			</if>
+			<if test="textBookName!=null">
+				TEXT_BOOK_NAME,
+			</if>
+			<if test="parentValue!=null">
+				PARENT_VALUE,
+			</if>
+			<if test="parentName!=null">
+				PARENT_NAME,
+			</if>
+			<if test="rank!=null">
+				RANK,
+			</if>
+			<if test="sortNo!=null">
+				SORT_NO,
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				CREATOR,
+			</if>
+			<if test="createTime!=null">
+				CREATE_TIME,
+			</if>
+			<if test="updateTime!=null">
+				UPDATE_TIME,
+			</if>
+			<if test="version!=null">
+				VERSION,
+			</if>
+			<if test="isDeleted!=null">
+				IS_DELETED,
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="textBookTypeCode!=null">
+				#{textBookTypeCode},
+			</if>
+			<if test="textBookValue!=null">
+				#{textBookValue},
+			</if>
+			<if test="textBookName!=null">
+				#{textBookName},
+			</if>
+			<if test="parentValue!=null">
+				#{parentValue},
+			</if>
+			<if test="parentName!=null">
+				#{parentName},
+			</if>
+			<if test="rank!=null">
+				#{rank},
+			</if>
+			<if test="sortNo!=null">
+				#{sortNo},
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				#{creator.id},
+			</if>
+			<if test="createTime!=null">
+				#{createTime},
+			</if>
+			<if test="updateTime!=null">
+				#{updateTime},
+			</if>
+			<if test="version!=null">
+				#{version},
+			</if>
+			<if test="isDeleted!=null">
+				#{isDeleted},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

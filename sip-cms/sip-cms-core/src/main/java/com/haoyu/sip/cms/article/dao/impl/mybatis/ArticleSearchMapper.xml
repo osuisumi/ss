@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.article.dao.impl.mybatis.ArticleSearchMapper" >
+	<resultMap id="ArticleResultMap" type="com.haoyu.sip.cms.article.entity.Article" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+   <!--  <result column="CONTENT" property="content" jdbcType="VARCHAR" /> -->
+    <result column="BROWSE_NUMBER" property="browseNumber" jdbcType="BIGINT" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <collection property="channels" ofType="com.haoyu.sip.cms.channel.entity.Channel">
+    	<id column="CHANNEL_ID" property="id"/>
+    </collection>
+  </resultMap>
+  <select id="selectByParameter" resultMap="ArticleResultMap" parameterType="java.util.Map" >
+  	SELECT CA.ID,CA.TITLE,CA.CONTENT,CA.CREATE_TIME,CA.BROWSE_NUMBER,
+	  (SELECT MAX(CHANNEL_ID) FROM cms_channel_article CCA 
+	  WHERE CCA.ARTICLE_ID=CA.ID
+	  <if test="channelId!=null and channelId!=''">
+	  	AND CCA.CHANNEL_ID=#{channelId,jdbcType=VARCHAR}
+	  </if>
+	  ) AS CHANNEL_ID
+	FROM
+		cms_article CA
+	WHERE
+		CA.IS_DELETED = 'N'
+		AND CA.STATE='published'
+		AND TITLE IS NOT NULL
+	<if test="keywordExpr!=null and keywordExpr!=''">
+		AND MATCH (title,content) AGAINST (
+			${keywordExpr} IN BOOLEAN MODE
+		)
+	</if>
+	ORDER BY
+		CREATE_TIME DESC  	
+  </select>
+</mapper>

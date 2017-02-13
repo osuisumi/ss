@@ -1,0 +1,17 @@
+com\haoyu\sip\point\service\impl\PointRecordService.class
+com\haoyu\sip\point\template\PointStrategyDataDirective.class
+com\haoyu\sip\point\service\impl\PointStrategyService.class
+com\haoyu\sip\point\event\DeletePointRecordEvent.class
+com\haoyu\sip\point\service\IPointStrategyService.class
+com\haoyu\sip\point\dao\IPointStrategyDao.class
+com\haoyu\sip\point\template\PointStrategysDirective.class
+com\haoyu\sip\point\template\PointRecordsDataDirective.class
+com\haoyu\sip\point\event\CreatePointRecordEvent.class
+com\haoyu\sip\point\service\IPointRecordService.class
+com\haoyu\sip\point\dao\IPointRecordDao.class
+com\haoyu\sip\point\dao\impl\mybatis\PointRecordDao.class
+com\haoyu\sip\point\entity\PointStrategy.class
+com\haoyu\sip\point\entity\PointRecord.class
+com\haoyu\sip\point\utils\UserPointCount.class
+com\haoyu\sip\point\dao\impl\mybatis\PointStrategyDao.class
+com\haoyu\sip\point\event\ChangePointRecordEvent.class

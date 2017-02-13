@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.article.dao.impl.mybatis.ArticleMapper" >
+  <resultMap id="ArticleResultMap" type="com.haoyu.sip.cms.article.entity.Article" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+    <result column="FRONT_COVER_IMAGE" property="frontCoverImage" jdbcType="VARCHAR" />
+    <result column="SUBTITLE" property="subtitle" jdbcType="VARCHAR" />
+    <result column="CONTENT" property="content" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="IS_TOP" property="isTop" jdbcType="VARCHAR" />
+    <result column="AUTHOR" property="author" jdbcType="VARCHAR" />
+    <result column="CONTRIBUTEDBY" property="contributedby" jdbcType="VARCHAR" />
+    <result column="ORIGIN" property="origin" jdbcType="VARCHAR" />
+    <result column="BROWSE_NUMBER" property="browseNumber" jdbcType="BIGINT" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <result column="PUBLISH_TIME" property="publishTime" jdbcType="BIGINT" />
+    <collection property="channels" ofType="com.haoyu.sip.cms.channel.entity.Channel">
+    	<id column="CHANNEL_ID" property="id"/>
+    	<result column="CHANNEL_NAME" property="name" jdbcType="VARCHAR" />
+    	<result column="CHANNEL_ALIAS" property="alias" jdbcType="VARCHAR" />
+    </collection>
+<!--     <association property="channel" javaType="com.haoyu.sip.cms.channel.entity.Channel">
+    	<id column="CHANNEL_ID" property="id"/>
+    	<result column="CHANNEL_NAME" property="name" jdbcType="VARCHAR" />
+    	<result column="CHANNEL_ALIAS" property="alias" jdbcType="VARCHAR" />
+    </association> -->
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.TITLE,M.FRONT_COVER_IMAGE,M.SUBTITLE,M.CONTENT,M.URL,M.STATE,M.IS_TOP,M.CREATE_TIME,M.PUBLISH_TIME,M.BROWSE_NUMBER,
+    MP.ID CHANNEL_ID,MP.NAME CHANNEL_NAME,MP.ALIAS CHANNEL_ALIAS,M.AUTHOR,M.CONTRIBUTEDBY,M.ORIGIN
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ArticleResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_ARTICLE M
+    left join CMS_CHANNEL_ARTICLE CCA
+    ON CCA.ARTICLE_ID=M.ID
+    left join CMS_CHANNEL MP
+    on MP.ID = CCA.CHANNEL_ID
+    and MP.IS_DELETED='N'
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="ArticleResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_ARTICLE M
+     join CMS_CHANNEL_ARTICLE CCA
+    ON CCA.ARTICLE_ID=M.ID
+     join CMS_CHANNEL MP
+    on MP.ID = CCA.CHANNEL_ID
+    and MP.IS_DELETED='N'
+    <if test="alias!=null and alias!=''">
+    	and MP.ALIAS=#{alias}
+    </if>
+    <if test="allChildrenAlias!=null">
+    	and MP.ALIAS IN
+    	<foreach collection="allChildrenAlias" item="alias" open="(" close=")" separator=",">
+    		#{alias}
+    	</foreach>
+    </if>
+    <if test="allChildrenId!=null">
+    	and MP.ID IN
+    	<foreach collection="allChildrenId" item="id" open="(" close=")" separator=",">
+    		#{id}
+    	</foreach>
+    </if>
+    <if test="channelId!=null and channelId!=''">
+    	and MP.ID=#{channelId,jdbcType=VARCHAR}
+    </if>
+    where M.IS_DELETED='N' 
+    <if test="title!=null and title!=''">
+    	 <bind name="pattern" value="'%' + title + '%'" />
+    	and M.TITLE LIKE	#{pattern} 
+    </if>
+    <if test="state!=null and state!=''">
+    	and M.STATE=#{state,jdbcType=VARCHAR}
+    </if>
+    <if test="subtitle!=null and subtitle!=null">
+    	and M.SUBTITLE=#{subtitle,jdbcType=VARCHAR}
+    </if>
+    <if test="isTop!=null and isTop!=''">
+    	and M.IS_TOP=#{isTop,jdbcType=VARCHAR}
+    </if>
+    order by M.IS_TOP DESC, M.CREATE_TIME DESC
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.article.entity.Article">
+  	insert into CMS_ARTICLE(ID,TITLE,SUBTITLE,FRONT_COVER_IMAGE,CONTENT,STATE,BROWSE_NUMBER,IS_TOP,AUTHOR,CONTRIBUTEDBY,ORIGIN,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR},#{subtitle,jdbcType=VARCHAR},#{frontCoverImage,jdbcType=VARCHAR},#{content,jdbcType=VARCHAR},#{state,jdbcType=VARCHAR},
+  	#{browseNumber,jdbcType=BIGINT},#{isTop,jdbcType=VARCHAR},#{author,jdbcType=VARCHAR},#{contributedby,jdbcType=VARCHAR},#{origin,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertChannelArticle" parameterType="com.haoyu.sip.cms.article.entity.Article" useGeneratedKeys="false" >
+  	insert into CMS_CHANNEL_ARTICLE(CHANNEL_ID,ARTICLE_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	select ID,#{id,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL}
+  	from CMS_CHANNEL CC
+  	WHERE is_deleted='N'
+  	AND ID IN
+  	<foreach collection="channels" item="channel" open="(" close=")" separator=",">
+  		#{channel.id}
+  	</foreach>
+  	and not exists(SELECT 1 FROM CMS_CHANNEL_ARTICLE CCA WHERE CCA.CHANNEL_ID=CC.ID AND CCA.ARTICLE_ID=#{id,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.article.entity.Article">
+  	update CMS_ARTICLE
+  	<set >
+      <if test="title != null and title!=''" >
+        TITLE = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="channel != null and channel.id!=null and channel.id!=''" >
+        CHANNEL_ID = #{channel.id,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null and content!=''" >
+        CONTENT = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="subtitle != null and subtitle!=''" >
+        SUBTITLE = #{subtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="frontCoverImage != null" >
+      	<if test="frontCoverImage!=''">
+        	FRONT_COVER_IMAGE = #{frontCoverImage,jdbcType=VARCHAR},
+        </if>
+        <if test="frontCoverImage==''">
+        	FRONT_COVER_IMAGE = '',
+        </if>
+      </if>
+      <if test="state != null and state!=''" >
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+       <if test="isTop != null and isTop!=''" >
+        IS_TOP = #{isTop,jdbcType=VARCHAR},
+      </if>
+       <if test="author != null and author!=''" >
+        AUTHOR = #{author,jdbcType=VARCHAR},
+      </if>
+       <if test="contributedby != null and contributedby!=''" >
+        CONTRIBUTEDBY = #{contributedby,jdbcType=VARCHAR},
+      </if>
+       <if test="origin != null and origin!=''" >
+        ORIGIN = #{origin,jdbcType=VARCHAR},
+      </if>
+<!--       <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if> -->
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateBrowseNum"  parameterType="com.haoyu.sip.cms.article.entity.Article">
+  	update CMS_ARTICLE
+  	set BROWSE_NUMBER=BROWSE_NUMBER+1
+  	where id=#{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete from CMS_ARTICLE
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteCmsChannelArticle" parameterType="com.haoyu.sip.cms.article.entity.Article">
+  	delete from CMS_CHANNEL_ARTICLE 
+  	where ARTICLE_ID=#{id,jdbcType=VARCHAR}
+  	<if test="channels!=null">
+  		AND CHANNEL_ID NOT IN
+  		<foreach collection="channels" item="channel" open="(" close=")" separator=",">
+  			#{channel.id}
+  		</foreach>
+  	</if>
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.article.entity.Article">
+  	  update CMS_ARTICLE
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION=VERSION+1
+      where 
+      ID=#{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

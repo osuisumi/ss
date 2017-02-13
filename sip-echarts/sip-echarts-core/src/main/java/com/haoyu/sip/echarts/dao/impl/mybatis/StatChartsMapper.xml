@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.echarts.dao.impl.mybatis.StatChartsMapper" >
+  <resultMap id="StatChartsResultMap" type="com.haoyu.sip.echarts.entity.StatCharts" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DATA_TYPE" property="dataType" jdbcType="VARCHAR" />
+    <result column="CACHE_EXPIRE_TIME" property="cacheExpireTime" jdbcType="INTEGER" />
+    <result column="REQUEST_URI" property="requestUri" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+    	<id column="RELATION_ID" property="id" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.NAME,M.RELATION_ID,M.DATA_TYPE,M.CACHE_EXPIRE_TIME,M.REQUEST_URI,M.CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="StatChartsResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from STAT_CHARTS M
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="StatChartsResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from STAT_CHARTS M
+    where M.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	and M.NAME LIKE CONCAT('%',#{name,jdbcType=VARCHAR},'%' )  
+    </if>
+    <if test="dataType!=null and dataType!=''">
+    	and M.DATA_TYPE=#{dataType,jdbcType=VARCHAR}
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and M.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+    ORDER BY M.NAME DESC
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.echarts.entity.StatCharts">
+  	insert into STAT_CHARTS(ID,NAME,RELATION_ID,DATA_TYPE,CACHE_EXPIRE_TIME,REQUEST_URI,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{relation.id,jdbcType=VARCHAR},#{dataType,jdbcType=VARCHAR},#{cacheExpireTime,jdbcType=INTEGER},#{requestUri,jdbcType=VARCHAR},
+  	#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.echarts.entity.StatCharts">
+  	update STAT_CHARTS
+  	<set >
+      <if test="requestUri != null and requestUri!=''" >
+        REQUEST_URI = #{requestUri,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="cacheExpireTime != null and cacheExpireTime!=''" >
+        CACHE_EXPIRE_TIME = #{cacheExpireTime,jdbcType=INTEGER},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete STAT_CHARTS
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.echarts.entity.StatCharts">
+  	  update STAT_CHARTS
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relation.id,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthResourceMapper" >
+  <resultMap id="ResourceResultMap" type="com.haoyu.sip.auth.entity.AuthResource" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+    <association property="parent" javaType="com.haoyu.sip.auth.entity.AuthResource">
+    	<id column="PARENT_ID" property="id"/>
+    	<result column="PARENT_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+    <collection property="permissions" ofType="com.haoyu.sip.auth.entity.AuthPermission">
+    	<id column="PERMISSION_ID" property="id"/>
+    	<result column="PERMISSION_NAME" property="name"/>
+    	<result column="ACTION" property="action"/>
+    	<result column="ACTION_URI" property="actionURI"/>
+    </collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    R.ID, R.NAME,R.CODE,R.RELATION_ID,RP.ID PARENT_ID,RP.NAME PARENT_NAME,P.ACTION ,P.ACTION_URI,
+    P.ID PERMISSION_ID,P.NAME PERMISSION_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResourceResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from AUTH_RESOURCE R
+    left join AUTH_PERMISSION P
+    on R.ID = P.RESOURCE_ID
+    and P.IS_DELETED='N'
+    left join AUTH_RESOURCE RP
+    on RP.ID = R.PARENT_ID
+    and RP.IS_DELETED='N'
+    where R.IS_DELETED='N'
+    and R.ID=#{id,jdbcType=VARCHAR}
+  </select>
+    <select id="selectByResource" resultMap="ResourceResultMap" parameterType="com.haoyu.sip.auth.entity.AuthResource" >
+    select 
+    <include refid="Base_Column_List"/>
+    from AUTH_RESOURCE R
+    left join AUTH_PERMISSION P
+    on R.ID = P.RESOURCE_ID
+    and P.IS_DELETED='N'
+    left join AUTH_RESOURCE RP
+    on RP.ID = R.PARENT_ID
+    and RP.IS_DELETED='N'
+    where R.IS_DELETED='N'
+    <if test="name!=null and name!=''">
+    	and R.NAME LIKE CONCAT(CONCAT('%',#{name,jdbcType=VARCHAR}),'%')  
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and R.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+    <if test="parent!=null and parent.id!=null">
+    	and R.PARENT_ID=#{parent.id,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.auth.entity.AuthResource">
+  	insert into AUTH_RESOURCE(ID,NAME,CODE,RELATION_ID,PARENT_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{code,jdbcType=VARCHAR},#{relationId,jdbcType=VARCHAR},
+  	<choose>
+  		<when test="parent!=null and parent.id!=null">
+  			#{parent.id,jdbcType=VARCHAR}
+  		</when>
+  		<otherwise>
+  			null
+  		</otherwise>
+  	</choose>
+  	,#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.auth.entity.AuthResource">
+  	update AUTH_RESOURCE
+  	<set >
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null and code!=''" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if>
+      <if test="parent != null and parent.id!=null" >
+        PARENT_ID = #{parent.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete from AUTH_RESOURCE
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.auth.entity.AuthResource">
+  	  update AUTH_RESOURCE
+  	  <set>
+  	  	IS_DELETED='Y',
+	  	<if test="updatedby != null" >
+	        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+	    </if>
+	    <if test="updateTime != null" >
+	      UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+	    </if>
+	    VERSION = VERSION+1
+  	  </set>
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relationId,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+  
+  <delete id="batchDeleteResourceByIds" parameterType="java.util.List">
+  	delete from AUTH_RESOURCE 
+  	where ID in
+  	<foreach collection="list" open="(" close=")" separator="," item="id">
+  		#{id,jdbcType=VARCHAR}
+  	</foreach>
+  </delete>
+</mapper>

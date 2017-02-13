@@ -1,0 +1,9 @@
+com\haoyu\sip\follow\event\CreateFollowEvent.class
+com\haoyu\sip\follow\template\FollowsDirective.class
+com\haoyu\sip\follow\service\IFollowService.class
+com\haoyu\sip\follow\dao\IFollowDao.class
+com\haoyu\sip\follow\entity\Follow.class
+com\haoyu\sip\follow\dao\impl\mybatis\FollowDao.class
+com\haoyu\sip\follow\entity\FollowStat.class
+com\haoyu\sip\follow\event\DeleteFollowEvent.class
+com\haoyu\sip\follow\service\impl\FollowServiceImpl.class

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.links.dao.impl.mybatis.LinksMapper" >
+  <resultMap id="LinksResultMap" type="com.haoyu.sip.cms.links.entity.Links" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+    <result column="TITLE_EN" property="titleEn" jdbcType="VARCHAR" />
+    <result column="SUMMARY" property="summary" jdbcType="VARCHAR" />
+    <result column="ICON" property="icon" jdbcType="VARCHAR" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="ORDER_NO" property="orderNo" jdbcType="INTEGER" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="linksType" javaType="com.haoyu.sip.cms.links.entity.LinksType">
+    	<id column="LINKS_TYPE_ID" property="id"/>
+    	<result column="LINKS_TYPE_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.TITLE,M.TITLE_EN,M.URL,M.SUMMARY,M.ICON,M.ORDER_NO,M.LINKS_TYPE_ID,C.NAME LINKS_TYPE_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="LinksResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_LINKS M
+    JOIN CMS_LINKS_TYPE C
+    ON M.LINKS_TYPE_ID = C.ID
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="LinksResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_LINKS M
+    JOIN CMS_LINKS_TYPE C
+    ON M.LINKS_TYPE_ID = C.ID
+    where M.IS_DELETED='N'
+    <if test="title!=null and title!=''">
+    	<bind name="pattern" value="'%' + title + '%'" />
+    	and M.TITLE LIKE #{pattern}
+    </if>
+    <if test="linksTypeId!=null and linksTypeId!=''">
+    	and EXISTS(SELECT 1 FROM CMS_LINKS_TYPE C WHERE C.ID=M.LINKS_TYPE_ID AND C.ID=#{linksTypeId,jdbcType=VARCHAR})
+    </if>
+    order by M.ORDER_NO
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.links.entity.Links">
+  	insert into CMS_LINKS(ID,TITLE,TITLE_EN,LINKS_TYPE_ID,URL,SUMMARY,ICON,ORDER_NO,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR},#{titleEn,jdbcType=VARCHAR},#{linksType.id,jdbcType=VARCHAR},#{url,jdbcType=VARCHAR},#{summary,jdbcType=VARCHAR},#{icon,jdbcType=VARCHAR},
+  	#{orderNo,jdbcType=INTEGER},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.links.entity.Links">
+  	update CMS_LINKS
+  	<set >
+      <if test="title != null and title!=''" >
+        TITLE = #{title,jdbcType=VARCHAR},
+      </if>
+       <if test="titleEn != null and titleEn!=''" >
+        TITLE_EN = #{titleEn,jdbcType=VARCHAR},
+      </if>
+       <if test="url != null and url!=''" >
+        URL = #{url,jdbcType=VARCHAR},
+      </if>
+       <if test="linksType != null and linksType.id!=null and linksType.id!=''" >
+        LINKS_TYPE_ID = #{linksType.id,jdbcType=VARCHAR},
+      </if>
+       <if test="summary != null and summary!=''" >
+        SUMMARY = #{summary,jdbcType=VARCHAR},
+      </if>
+       <if test="icon != null and icon!=''" >
+        ICON = #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null" >
+        ORDER_NO = #{orderNo,jdbcType=INTEGER},
+      </if>
+<!--  <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if> -->
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_LINKS
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.links.entity.Links">
+  	  update CMS_LINKS
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relationId,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

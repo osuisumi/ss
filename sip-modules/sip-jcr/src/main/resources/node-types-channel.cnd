@@ -1,0 +1,6 @@
+<ns = 'http://namespace.com/ns'>
+<cms = 'http://sip.haoyu.com/cms'>
+
+[cms:channel] > nt:base, mix:referenceable
+- title (string) COPY
+

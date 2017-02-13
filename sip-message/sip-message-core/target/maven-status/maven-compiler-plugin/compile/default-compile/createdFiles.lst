@@ -1,0 +1,9 @@
+com\haoyu\sip\message\dao\IMessageDao.class
+com\haoyu\sip\message\service\IMessageService.class
+com\haoyu\sip\message\template\MessagesDataDirective.class
+com\haoyu\sip\message\utils\MessageState.class
+com\haoyu\sip\message\dao\impl\mybatis\MessageDao.class
+com\haoyu\sip\message\service\impl\MessageService.class
+com\haoyu\sip\message\template\MessageDataDirective.class
+com\haoyu\sip\message\entity\Message.class
+com\haoyu\sip\message\utils\MessageType.class

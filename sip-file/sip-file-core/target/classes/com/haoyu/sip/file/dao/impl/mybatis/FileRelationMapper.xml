@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.file.dao.impl.mybatis.FileRelationMapper" >
+  <resultMap id="FileRelationMap" type="com.haoyu.sip.file.entity.FileRelation" >
+  	<id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="RELATION_ID" property="relation.id" jdbcType="VARCHAR" />
+    <result column="FILE_ID" property="fileId" jdbcType="VARCHAR" />
+    <result column="DOWNLOAD_NUM" property="downloadNum" jdbcType="INTEGER" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID,RELATION_ID,FILE_ID,DOWNLOAD_NUM, TYPE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="FileRelationMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FILE_RESOURCE_RELATION
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.file.entity.FileRelation" >
+    insert into FILE_RELATION(ID,RELATION_ID,FILE_ID,DOWNLOAD_NUM,TYPE,CREATOR,CREATE_TIME,UPDATEDBY,UPDATE_TIME,IS_DELETED,VERSION)
+    values(#{id,jdbcType=VARCHAR},#{relation.id,jdbcType=VARCHAR},#{fileId,jdbcType=VARCHAR},#{downloadNum,jdbcType=INTEGER},
+    #{type,jdbcType=VARCHAR}, #{creator.id,jdbcType=VARCHAR}, #{createTime,jdbcType=INTEGER}, #{updatedby.id,jdbcType=VARCHAR}, 
+    #{updateTime,jdbcType=INTEGER}, #{isDeleted,jdbcType=CHAR}, #{version,jdbcType=INTEGER}
+    )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.file.entity.FileRelation" >
+    update FILE_RELATION
+    <set>
+      <if test="downloadNum != null and downloadNum > 0" >
+        DOWNLOAD_NUM = DOWNLOAD_NUM + 1,
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime!=null">
+      	UPDATE_TIME=#{updateTime,jdbcType=INTEGER},
+      </if>
+    </set>
+    ,VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="deleteFileRelation" parameterType="com.haoyu.sip.file.entity.FileRelation">
+  	update FILE_RELATION FR
+  	set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime, jdbcType=INTEGER}
+  	<if test="updatedby != null and updatedby != ''">
+  		,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+  	</if>
+  	where IS_DELETED = 'N'
+  	<if test="id != null and id != ''">
+  		and ID = #{id,jdbcType=VARCHAR}
+  	</if>
+  	<if test="fileId != null and fileId != ''">
+  		and (FILE_ID = #{fileId,jdbcType=VARCHAR} or exists (select 1 from FILE_RESOURCE where ID = FR.FILE_ID and PARENT_ID = #{fileId,jdbcType=VARCHAR}))
+  	</if>
+  	<if test="relation != null and relation.id != null and relation.id != ''">
+  		and RELATION_ID = #{relation.id,jdbcType=VARCHAR}
+  	</if>
+  </update>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.feedback.dao.impl.mybatis.FeedbackMapper" >
+  <resultMap type="com.haoyu.sip.feedback.entity.Feedback" id="FeedbackResultMap">
+  	<id property="id" column="ID" jdbcType="VARCHAR"/>
+  	<result property="content" column="CONTENT" jdbcType="VARCHAR"/>
+  	<result property="email" column="EMAIL" jdbcType="VARCHAR"/>
+  	<result property="qq" column="QQ" jdbcType="VARCHAR"/>
+  	<result property="realName" column="REAL_NAME" jdbcType="VARCHAR"/>
+  	<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+	    	<id property="id" column="USER_ID"/>
+	    	<result property="realName" column="REAL_NAME"/>
+	</association>
+	<association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+  		<id property="id" column="RELATION_ID"/>
+  		<result property="type" column="RELATION_TYPE"/>
+  	</association>
+  </resultMap>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="FeedbackResultMap">
+  	select FB.ID,FB.CONTENT,FB.EMAIL,FB.QQ,FB.REAL_NAME,
+  	FB.RELATION_ID,FB.RELATION_TYPE
+  	from FEEDBACK FB
+  	left join BASE_USER_VIEW BUV
+  	on FB.CREATOR = BUV.ID
+  	where ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.feedback.entity.Feedback" >
+    insert into FEEDBACK (ID, REAL_NAME,QQ,EMAIL,CONTENT,RELATION_ID, RELATION_TYPE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+    values (#{id,jdbcType=VARCHAR},#{realName,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{content,jdbcType=VARCHAR},#{relation.id,jdbcType=VARCHAR}, #{relation.type,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},
+  	#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+</mapper>

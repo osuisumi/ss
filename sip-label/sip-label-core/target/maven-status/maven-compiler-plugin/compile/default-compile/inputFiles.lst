@@ -1,0 +1,12 @@
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\entity\Label.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\dao\impl\mybatis\LabelDao.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\dao\ILabelRelationDao.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\dao\ILabelDao.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\base\entity\BaseEntity.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\base\utils\BaseServiceUtils.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\service\ILabelService.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\service\impl\LabelRelationServiceImpl.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\dao\impl\mybatis\LabelRelationDao.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\service\impl\LabelServiceImpl.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\entity\LabelRelation.java
+E:\workshopspace\base\sip\sip-label\sip-label-core\src\main\java\com\haoyu\sip\label\service\ILabelRelationService.java

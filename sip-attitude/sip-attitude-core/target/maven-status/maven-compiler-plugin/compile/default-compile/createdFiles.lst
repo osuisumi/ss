@@ -1,0 +1,8 @@
+com\haoyu\sip\attitude\event\CreateAttitudeUserEvent.class
+com\haoyu\sip\attitude\event\DeleteAttitudeUserEvent.class
+com\haoyu\sip\attitude\service\IAttitudeService.class
+com\haoyu\sip\attitude\entity\AttitudeStat.class
+com\haoyu\sip\attitude\entity\AttitudeUser.class
+com\haoyu\sip\attitude\dao\impl\mybatis\AttitudeUserDao.class
+com\haoyu\sip\attitude\service\impl\AttitudeServiceImpl.class
+com\haoyu\sip\attitude\dao\IAttitudeUserDao.class

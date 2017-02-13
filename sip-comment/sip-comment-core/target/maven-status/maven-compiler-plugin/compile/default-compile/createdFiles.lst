@@ -1,0 +1,17 @@
+com\haoyu\sip\comment\event\UpdateCommentEvent.class
+com\haoyu\sip\comment\listener\ClearCache_CreateCommentListener.class
+com\haoyu\sip\comment\dao\ICommentDao.class
+com\haoyu\sip\comment\entity\CommentStat.class
+com\haoyu\sip\comment\utils\RelationType.class
+com\haoyu\base\entity\BaseEntity.class
+com\haoyu\sip\comment\listener\ClearCache_UpdateCommentListener.class
+com\haoyu\sip\comment\event\CreateCommentEvent.class
+com\haoyu\base\utils\BaseServiceUtils.class
+com\haoyu\sip\comment\template\CommentsDirective.class
+com\haoyu\sip\comment\dao\impl\mybatis\CommentDao.class
+com\haoyu\sip\comment\service\ICommentService.class
+com\haoyu\sip\comment\entity\Comment.class
+com\haoyu\sip\comment\service\impl\CommentServiceImpl.class
+com\haoyu\sip\comment\listener\ClearCache_DeleteCommentListener.class
+com\haoyu\sip\comment\event\DeleteCommentEvent.class
+com\haoyu\sip\comment\template\CommentsDataDirective.class

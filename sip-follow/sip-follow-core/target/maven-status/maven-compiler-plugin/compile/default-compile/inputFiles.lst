@@ -1,0 +1,9 @@
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\dao\IFollowDao.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\entity\FollowStat.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\event\DeleteFollowEvent.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\service\IFollowService.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\dao\impl\mybatis\FollowDao.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\template\FollowsDirective.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\service\impl\FollowServiceImpl.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\event\CreateFollowEvent.java
+E:\workshopspace\base\sip\sip-follow\sip-follow-core\src\main\java\com\haoyu\sip\follow\entity\Follow.java

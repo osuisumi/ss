@@ -1,0 +1,16 @@
+com\haoyu\sip\gallery\service\IPhotoGalleryService.class
+com\haoyu\sip\gallery\template\PhotoGalleryListDirective.class
+com\haoyu\sip\gallery\dao\IPhotoDao.class
+com\haoyu\sip\gallery\entity\Photo.class
+com\haoyu\sip\gallery\dao\impl\mybatis\PhotoDao.class
+com\haoyu\sip\gallery\service\impl\PhotoGalleryServiceImpl.class
+com\haoyu\sip\gallery\dao\impl\mybatis\PhotoGalleryPhotoDao.class
+com\haoyu\sip\gallery\entity\PhotoGallery.class
+com\haoyu\sip\gallery\template\PhotoListDirective.class
+com\haoyu\sip\gallery\event\AddPhotosToGalleryEvent.class
+com\haoyu\sip\gallery\entity\PhotoGalleryPhoto.class
+com\haoyu\sip\gallery\dao\impl\mybatis\PhotoGalleryDao.class
+com\haoyu\sip\gallery\dao\IPhotoGalleryDao.class
+com\haoyu\sip\gallery\service\IPhotoService.class
+com\haoyu\sip\gallery\service\impl\PhotoServiceImpl.class
+com\haoyu\sip\gallery\dao\IPhotoGalleryPhotoDao.class

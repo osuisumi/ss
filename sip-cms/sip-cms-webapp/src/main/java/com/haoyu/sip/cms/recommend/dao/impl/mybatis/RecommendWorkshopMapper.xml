@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.recommend.dao.impl.mybatis.RecommendWorkshopMapper" >
+  <resultMap id="RecommendWorkshopResultMap" type="com.haoyu.sip.cms.recommend.entity.RecommendWorkshop" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="WORKSHOP_NAME" property="workshopName" jdbcType="VARCHAR" />
+    <result column="MEMBER_NUM" property="memberNum" jdbcType="INTEGER" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="recommend" javaType="com.haoyu.sip.cms.recommend.entity.Recommend">
+    	<id column="RECOMMEND_ID" property="id"/>
+    	<result column="ORDER_NO" property="orderNo" jdbcType="INTEGER" />
+    	<association property="relation" javaType="com.haoyu.sip.core.entity.Relation">
+	    	<id column="RELATION_ID" property="id"/>
+	    	<result column="RELATION_TYPE" property="type" jdbcType="VARCHAR" />
+	    </association>
+	    <association property="channel" javaType="com.haoyu.sip.cms.channel.entity.Channel">
+	    	<id column="CHANNEL_ID" property="id"/>
+	    	<result column="CHANNEL_NAME" property="name" jdbcType="VARCHAR" />
+	    </association>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    C.ID,C.WORKSHOP_NAME,C.CREATE_TIME,C.MEMBER_NUM,
+    (CASE WHEN M.ORDER_NO IS NULL THEN 1000 ELSE M.ORDER_NO END) ORDER_NO,
+    M.RELATION_ID,M.RELATION_TYPE,CC.ID CHANNEL_ID,CC.NAME CHANNEL_NAME,M.ID RECOMMEND_ID
+  </sql>
+  <select id="selectByParameter" resultMap="RecommendWorkshopResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from  VIEW_WORKSHOP C
+    LEFT JOIN CMS_RECOMMEND M
+    ON M.RELATION_ID = C.ID
+    AND M.IS_DELETED='N'
+    <if test="channel!=null and channel.id!=null">
+    	and  M.CHANNEL_ID=#{channel.id,jdbcType=VARCHAR}
+    </if>
+    <if test="relationType!=null and relationType!=''">
+    	and M.RELATION_TYPE=#{relationType,jdbcType=VARCHAR}
+    </if>
+    LEFT JOIN CMS_CHANNEL CC
+    ON CC.ID=M.CHANNEL_ID
+   	<where>
+    <if test="workshopName!=null and workshopName!=''">
+    	 C.WORKSHOP_NAME LIKE CONCAT('%',#{workshopName,jdbcType=VARCHAR},'%' )  
+    </if>
+    </where>
+  </select>
+ 
+</mapper>

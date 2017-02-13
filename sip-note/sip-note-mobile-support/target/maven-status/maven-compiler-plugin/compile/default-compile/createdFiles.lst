@@ -1,0 +1,4 @@
+com\haoyu\sip\note\mobile\service\IMNoteService.class
+com\haoyu\sip\note\mobile\controller\MNoteController.class
+com\haoyu\sip\note\mobile\entity\MNote.class
+com\haoyu\sip\note\mobile\service\impl\MNoteServiceImpl.class

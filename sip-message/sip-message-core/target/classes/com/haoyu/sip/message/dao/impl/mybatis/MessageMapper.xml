@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.message.dao.impl.mybatis.MessageMapper">
+	<resultMap id="baseResultMap" type="com.haoyu.sip.message.entity.Message">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="SENDER_ID" property="sender.id" jdbcType="VARCHAR" />
+		<result column="SENDER_REAL_NAME" property="sender.realName" jdbcType="VARCHAR" />
+		<result column="SENDER_AVATAR" property="sender.avatar" jdbcType="VARCHAR"/>
+		<result column="RECEIVER_ID" property="receiver.id" jdbcType="VARCHAR" />
+		<result column="RECEIVER_REAL_NAME" property="receiver.realName" jdbcType="VARCHAR"/>
+		<result column="RECEIVER_AVATAR" property="receiver.avatar" jdbcType="VARCHAR"/>
+		<result column="TITLE" property="title" jdbcType="VARCHAR" />
+		<result column="CONTENT" property="content" jdbcType="VARCHAR" />
+		<result column="SENDER_STATE" property="senderState" jdbcType="VARCHAR" />
+		<result column="SENDER_STATE_CHANGE_DATE" property="senderStateChangeDate" jdbcType="VARCHAR" />
+		<result column="RECEIVER_STATE" property="receiverState" jdbcType="VARCHAR" />
+		<result column="RECEIVER_STATE_CHANGE_DATE" property="receiverStateChangeDate" jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<result column="READED" property="readed" jdbcType="VARCHAR" />
+		<result column="REPLIED" property="replied" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="BIGINT"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		select M.ID,M.SENDER_ID,M.RECEIVER_ID,M.TITLE,M.CONTENT,M.SENDER_STATE,M.SENDER_STATE_CHANGE_DATE,M.RECEIVER_STATE,M.RECEIVER_STATE_CHANGE_DATE,M.TYPE,M.READED,M.REPLIED,M.CREATE_TIME,
+		
+		(select BUV.REAL_NAME from BASE_USER_VIEW BUV where BUV.ID = M.SENDER_ID) SENDER_REAL_NAME,
+		(select BUV.AVATAR from BASE_USER_VIEW BUV where BUV.ID = M.SENDER_ID) SENDER_AVATAR,
+		
+		(select BUV.REAL_NAME from BASE_USER_VIEW BUV where BUV.ID = M.RECEIVER_ID) RECEIVER_REAL_NAME,
+		(select BUV.AVATAR from BASE_USER_VIEW BUV where BUV.ID = M.RECEIVER_ID) RECEIVER_AVATAR
+		
+		from MESSAGE M 
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="baseResultMap" parameterType="java.lang.String">
+		<include refid="Base_Column_List" />
+		where M.IS_DELETED='N'
+		and M.ID=#{id,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByParameter" resultMap="baseResultMap" parameterType="java.util.Map">
+		<include refid="Base_Column_List" />
+		where M.IS_DELETED='N'
+		<choose>
+		    <when test="queryType == 'userMessageGroup'">
+		        <if test="senderId != null and senderId != '' and receiverId != null and receiverId != ''">
+		            and (M.SENDER_ID = #{senderId,jdbcType=VARCHAR} or M.SENDER_ID = #{receiverId,jdbcType=VARCHAR} )
+		            and (M.RECEIVER_ID = #{receiverId,jdbcType=VARCHAR} or M.RECEIVER_ID = #{senderId,jdbcType=VARCHAR} )
+		            and M.SENDER_ID != M.RECEIVER_ID
+		        </if>
+		    </when>
+		    <otherwise>
+				<if test="senderId != null and senderId != ''">
+					and M.SENDER_ID = #{senderId,jdbcType=VARCHAR}
+				</if>
+				<if test="receiverId != null and receiverId != ''">
+					and M.RECEIVER_ID = #{receiverId,jdbcType=VARCHAR}
+				</if>
+		    </otherwise>
+		</choose>
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.message.entity.Message">
+		insert into MESSAGE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="sender != null and sender.id != null">
+				SENDER_ID,
+			</if>
+			<if test="receiver != null and receiver.id != null">
+				RECEIVER_ID,
+			</if>
+			<if test="title != null">
+				TITLE,
+			</if>
+			<if test="content != null">
+				CONTENT,
+			</if>
+			<if test="senderState != null">
+				SENDER_STATE,
+			</if>
+			<if test="senderStateChangeDate != null">
+				SENDER_STATE_CHANGE_DATE,
+			</if>
+			<if test="receiverState != null">
+				RECEIVER_STATE,
+			</if>
+			<if test="receiverStateChangeDate != null">
+				RECEIVER_STATE_CHANGE_DATE,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+			<if test="readed != null">
+				READED,
+			</if>
+			<if test="replied != null">
+				REPLIED,
+			</if>
+			<if test="creator != null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="sender != null and sender.id != null">
+				#{sender.id,jdbcType=VARCHAR},
+			</if>
+			<if test="receiver != null and receiver.id != null">
+				#{receiver.id,jdbcType=VARCHAR},
+			</if>
+			<if test="title != null">
+				#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null">
+				#{content,jdbcType=VARCHAR},
+			</if>
+			<if test="senderState != null">
+				#{senderState,jdbcType=VARCHAR},
+			</if>
+			<if test="senderStateChangeDate != null">
+				#{senderStateChangeDate,jdbcType=VARCHAR},
+			</if>
+			<if test="receiverState != null">
+				#{receiverState,jdbcType=VARCHAR},
+			</if>
+			<if test="receiverStateChangeDate != null">
+				#{receiverStateChangeDate,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="readed != null">
+				#{readed,jdbcType=VARCHAR},
+			</if>
+			<if test="replied != null">
+				#{replied,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<insert id="batchInsert" parameterType="map">
+		insert into MESSAGE(ID,SENDER_ID,RECEIVER_ID,TITLE,CONTENT,SENDER_STATE,SENDER_STATE_CHANGE_DATE,RECEIVER_STATE,RECEIVER_STATE_CHANGE_DATE,TYPE,READED,REPLIED,CREATOR,CREATE_TIME,UPDATE_TIME,VERSION,IS_DELETED)
+		(select ${entity.id},#{entity.sender.id,jdbcType=VARCHAR},BUV.ID,#{entity.title,jdbcType=VARCHAR},#{entity.content,jdbcType=VARCHAR},#{entity.senderState,jdbcType=VARCHAR},#{entity.senderStateChangeDate,jdbcType=VARCHAR},#{entity.receiverState,jdbcType=VARCHAR},#{entity.receiverStateChangeDate,jdbcType=VARCHAR},#{entity.type,jdbcType=VARCHAR},#{entity.readed,jdbcType=VARCHAR},#{entity.replied,jdbcType=VARCHAR},#{entity.creator.id,jdbcType=VARCHAR},#{entity.createTime,jdbcType=VARCHAR},#{entity.updateTime,jdbcType=VARCHAR},#{entity.version,jdbcType=VARCHAR},#{entity.isDeleted,jdbcType=VARCHAR}
+		from BASE_USER_VIEW BUV
+		<if test="receiverIds != null">
+			where BUV.ID in
+			<foreach collection="receiverIds" open="(" close=")" item="item" separator=",">
+				#{item,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		)
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.message.entity.Message">
+		update MESSAGE
+		<set>
+			<if test="senderState != null and senderState != ''">
+				SENDER_STATE = #{senderState,jdbcType=VARCHAR},
+			</if>
+			<if test="receiverState != null and receiverState != ''">
+				RECEIVER_STATE = #{receiverState,jdbcType=VARCHAR},
+			</if>
+			<if test="readed != null and readed">
+				READED = #{readed,jdbcType=VARCHAR}
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteByPhysics" parameterType="java.lang.String">
+		delete from MESSAGE
+		where ID=#{id,jdbcType=VARCHAR}
+	</delete>
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.message.entity.Message">
+		update MESSAGE
+		set IS_DELETED='Y',
+		<if test="updatedby != null">
+			UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+		</if>
+		<if test="updateTime != null">
+			UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+		</if>
+		VERSION=VERSION+1
+		where ID=#{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.siteinfo.dao.impl.mybatis.SiteInfoMapper" >
+  <resultMap id="SiteInfoResultMap" type="com.haoyu.sip.cms.siteinfo.entity.SiteInfo" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="DOMAIN" property="domain" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ICP" property="icp" jdbcType="VARCHAR" />
+    <result column="MAPPING_FOLDER" property="mappingFolder" jdbcType="VARCHAR" />
+    <result column="COPY_RIGHT" property="copyRight" jdbcType="VARCHAR" />
+    <result column="FOOTER_HTML" property="footerHtml" jdbcType="VARCHAR" />
+    <result column="RELATION_ID" property="relationId" jdbcType="VARCHAR" />
+    <result column="WEIXIN_QRCODE" property="weixinQrcode" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <association property="adminTheme" javaType="com.haoyu.sip.theme.entity.VisualTheme">
+    	<id column="ADMIN_THEME_ID" property="id" jdbcType="VARCHAR" />
+    	<result column="ADMIN_THEME_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="frontEndTheme" javaType="com.haoyu.sip.theme.entity.VisualTheme">
+    	<id column="FRONTEND_THEME_ID" property="id" jdbcType="VARCHAR" />
+    	<result column="FRONTEND_THEME_NAME" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID,M.CREATE_TIME, M.DOMAIN,M.NAME,M.DESCRIPTION,M.RELATION_ID,M.ICP,M.MAPPING_FOLDER,M.COPY_RIGHT,M.FOOTER_HTML,M.WEIXIN_QRCODE,VT.NAME ADMIN_THEME_NAME,M.ADMIN_THEME_ID,
+    FVT.NAME FRONTEND_THEME_NAME,M.FRONTEND_THEME_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="SiteInfoResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_SITE_INFO M
+    left join VISUAL_THEME VT
+    ON VT.ID=M.ADMIN_THEME_ID
+    left join VISUAL_THEME FVT
+    on FVT.ID=M.FRONTEND_THEME_ID
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+   <select id="selectByDomain" resultMap="SiteInfoResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_SITE_INFO M
+    left join VISUAL_THEME VT
+    ON VT.ID=M.ADMIN_THEME_ID
+    left join VISUAL_THEME FVT
+    on FVT.ID=M.FRONTEND_THEME_ID
+    where M.IS_DELETED='N'
+    and M.DOMAIN=#{domain,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="SiteInfoResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_SITE_INFO M
+    left join VISUAL_THEME VT
+    ON VT.ID=M.ADMIN_THEME_ID
+    left join VISUAL_THEME FVT
+    on FVT.ID=M.FRONTEND_THEME_ID
+    where M.IS_DELETED='N'
+    <if test="domain!=null and domain!=''">
+    	 <bind name="pattern" value="'%' + domain + '%'" />
+    	and M.DOMAIN LIKE  #{pattern}
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and M.RELATION_ID=#{relationId,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.siteinfo.entity.SiteInfo">
+  	insert into CMS_SITE_INFO(ID,NAME,DESCRIPTION,DOMAIN,ADMIN_THEME_ID,FRONTEND_THEME_ID,MAPPING_FOLDER,RELATION_ID,ICP,COPY_RIGHT,FOOTER_HTML,WEIXIN_QRCODE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{description,jdbcType=VARCHAR},#{domain,jdbcType=VARCHAR},#{adminlTheme.id,jdbcType=VARCHAR},#{frontEndTheme.id,jdbcType=VARCHAR},#{mappingFolder,jdbcType=VARCHAR},#{relationId,jdbcType=VARCHAR},#{icp,jdbcType=VARCHAR},#{copyRight,jdbcType=VARCHAR},
+  	#{footerHtml,jdbcType=VARCHAR},#{weixinQrcode,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.siteinfo.entity.SiteInfo">
+  	update CMS_SITE_INFO
+  	<set >
+      <if test="domain != null and domain!=''" >
+        DOMAIN = #{domain,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null and description!=''" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+       <if test="adminTheme.id != null and adminTheme.id!=''" >
+        ADMIN_THEME_ID = #{adminTheme.id,jdbcType=VARCHAR},
+      </if>
+      <if test="frontEndTheme.id != null and frontEndTheme.id!=''" >
+        FRONTEND_THEME_ID = #{frontEndTheme.id,jdbcType=VARCHAR},
+      </if>
+       <if test="mappingFolder != null and mappingFolder!=''" >
+        MAPPING_FOLDER = #{mappingFolder,jdbcType=VARCHAR},
+      </if>
+      <if test="icp != null and icp!=''" >
+        ICP = #{icp,jdbcType=VARCHAR},
+      </if>
+      <if test="copyRight != null and copyRight!=''" >
+        COPY_RIGHT = #{copyRight,jdbcType=VARCHAR},
+      </if>
+      <if test="footerHtml != null and footerHtml!=''" >
+        FOOTER_HTML = #{footerHtml,jdbcType=VARCHAR},
+      </if>
+      <if test="weixinQrcode != null and weixinQrcode!=''" >
+        WEIXIN_QRCODE = #{weixinQrcode,jdbcType=VARCHAR},
+      </if>
+<!--  <if test="relationId != null and relationId!=''" >
+        RELATION_ID = #{relationId,jdbcType=VARCHAR},
+      </if> -->
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_SITE_INFO
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.siteinfo.entity.SiteInfo">
+  	  update CMS_SITE_INFO
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		RELATION_ID=#{relationId,jdbcType=VARCHAR}
+      	</otherwise>
+      </choose>
+  </update>
+</mapper>

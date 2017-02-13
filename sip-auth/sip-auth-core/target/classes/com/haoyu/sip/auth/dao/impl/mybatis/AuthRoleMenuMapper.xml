@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthRoleMenuMapper" >
+  <insert id="insertByMenuRoles" parameterType="java.util.Map">
+  	insert into AUTH_ROLE_MENU(MENU_ID,ROLE_ID)
+	select #{menu.id,jdbcType=VARCHAR},ID
+	from AUTH_ROLE R
+	where ID IN
+	<foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+		#{roleId,jdbcType=VARCHAR}
+	</foreach>
+	AND IS_DELETED='N'
+  </insert>
+  <insert id="insertByRoleMenus" parameterType="java.util.Map">
+  	insert into AUTH_ROLE_MENU(MENU_ID,ROLE_ID)
+	select ID,#{role.id,jdbcType=VARCHAR}
+	from AUTH_MENU M
+	where ID IN
+	<foreach collection="menuIds" item="menuId" separator="," open="(" close=")">
+		#{menuId,jdbcType=VARCHAR}
+	</foreach>
+	AND IS_DELETED='N'
+	AND NOT EXISTS(SELECT 1 FROM AUTH_ROLE_MENU AMR WHERE AMR.ROLE_ID=#{role.id,jdbcType=VARCHAR} and AMR.MENU_ID=M.ID)
+  </insert>
+  <delete id="deleteByPhysics" parameterType="java.util.Map">
+  	delete from AUTH_ROLE_MENU
+    <where>
+	    <if test="menu!=null">
+	    	AND MENU_ID=#{menu.id,jdbcType=VARCHAR}
+	    </if>
+	    <if test="role!=null">
+	    	AND ROLE_ID=#{role.id,jdbcType=VARCHAR}
+	    </if>
+	    <if test="menuIds!=null and menuIds.size()>0">
+	    	AND MENU_ID IN
+	    	<foreach collection="menuIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+	    <if test="roleIds!=null and roleIds.size()>0">
+	    	AND ROLE_ID IN
+	    	<foreach collection="roleIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+    </where>
+  </delete>
+</mapper>

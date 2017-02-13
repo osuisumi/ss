@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.diary.dao.impl.mybatis.DiaryMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.diary.entity.Diary">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="TITLE" property="title" jdbcType="VARCHAR" />
+		<result column="CONTENT" property="content" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<result column="IS_TOP" property="isTop" jdbcType="VARCHAR" />
+		<result column="IS_ESSENCE" property="isEssence" jdbcType="VARCHAR" />
+		<result column="IS_HOT" property="isHot" jdbcType="VARCHAR" />
+		<result column="BROWSE_NUM" property="browseNum" jdbcType="INTEGER" />
+		<result column="SUPPORT_NUM" property="supportNum" jdbcType="INTEGER" />
+		<result column="COMMENT_NUM" property="commentNum" jdbcType="INTEGER" />
+		<result column="VISIT_PERMISSION" property="visitPermission" jdbcType="VARCHAR" />
+		<result column="DIARY_CATEGORY_ID" property="diaryCategory.id" jdbcType="VARCHAR" />
+		<result column="CREATOR" property="creator.id" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="DECIMAL" />
+	</resultMap>
+	<select id="select" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+			D.ID,
+			D.TITLE,
+			D.CONTENT,
+			D.STATE,
+			D.BROWSE_NUM,
+			D.SUPPORT_NUM,
+			D.COMMENT_NUM,
+			D.VISIT_PERMISSION,
+			D.DIARY_CATEGORY_ID,
+			D.IS_TOP,
+			D.IS_ESSENCE,
+			D.IS_HOT,
+			D.CREATOR,
+			D.CREATE_TIME,
+			D.UPDATE_TIME			
+		from 
+			DIARY D
+		left join DIARY_CATEGORY DC on DC.ID = D.DIARY_CATEGORY_ID 
+		where D.IS_DELETED = 'N'
+		<if test="creator != null and creator != ''">
+			and D.CREATOR = #{creator}
+		</if>
+		<if test="diaryCategory != null and diaryCategory.id != ''">
+			and D.DIARY_CATEGORY_ID = #{diaryCategory.id}
+		</if>
+		<if test="ids != null">
+			and D.ID in 
+			<foreach collection="ids" open="(" close=")" separator="," item="id">
+				#{id,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		<if test="visitPermission != null and visitPermission != ''">
+			and D.VISIT_PERMISSION = #{visitPermission,jdbcType=VARCHAR}
+		</if>
+		<if test="title != null and title != ''">
+			and D.TITLE like '%${title}%'
+		</if>
+		order by D.IS_TOP desc , D.CREATE_TIME desc
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+			D.ID,
+			D.TITLE,
+			D.CONTENT,
+			D.STATE,
+			D.BROWSE_NUM,
+			D.SUPPORT_NUM,
+			D.COMMENT_NUM,
+			D.VISIT_PERMISSION,
+			D.DIARY_CATEGORY_ID,
+			D.IS_TOP,
+			D.IS_ESSENCE,
+			D.IS_HOT,
+			D.CREATOR,
+			D.CREATE_TIME
+		from
+			DIARY D
+		left join DIARY_CATEGORY DC on DC.ID = D.DIARY_CATEGORY_ID
+		where D.IS_DELETED = 'N'
+			and  D.ID = #{id,jdbcType=VARCHAR} 
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.diary.entity.Diary">
+		insert into DIARY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="title != null and title != ''">
+				TITLE,
+			</if>
+			<if test="content != null and content != ''">
+				CONTENT,
+			</if>
+			<if test="state != null and state != ''">
+				STATE,
+			</if>
+			<if test="browseNum != null ">
+				BROWSE_NUM,
+			</if>
+			<if test="supportNum != null ">
+				SUPPORT_NUM,
+			</if>
+			<if test="commentNum != null ">
+				COMMENT_NUM,
+			</if>
+			<if test="visitPermission != null and visitPermission != ''">
+				VISIT_PERMISSION,
+			</if>
+			<if test="diaryCategory != null and diaryCategory.id != null">
+				DIARY_CATEGORY_ID,
+			</if>
+			<if test="isTop != null and isTop != ''">
+				IS_TOP,
+			</if>			
+			<if test="isHot != null and isHot != ''">
+				IS_HOT,
+			</if>
+			<if test="isEssence != null and isEssence != ''">
+				IS_ESSENCE,
+			</if>
+			<if test="creator != null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="title != null and title != ''">
+				#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content != ''">
+				#{content,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null and state != ''">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="browseNum != null">
+				#{browseNum,jdbcType=DECIMAL},
+			</if>
+			<if test="supportNum != null ">
+				#{supportNum,jdbcType=DECIMAL},
+			</if>
+			<if test="commentNum != null">
+				#{commentNum,jdbcType=DECIMAL},
+			</if>
+			<if test="visitPermission != null and visitPermission != ''">
+				#{visitPermission,jdbcType=VARCHAR},
+			</if>
+			<if test="diaryCategory != null and diaryCategory.id != null">
+				#{diaryCategory.id,jdbcType=VARCHAR},
+			</if>
+			<if test="isTop != null and isTop != ''">
+				#{isTop,jdbcType=VARCHAR},
+			</if>			
+			<if test="isHot != null and isHot != ''">
+				#{isHot,jdbcType=VARCHAR},
+			</if>
+			<if test="isEssence != null and isEssence != ''">
+				#{isEssence,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.diary.entity.Diary">
+		update DIARY D
+		<set>
+			<if test="title != null and title !=''">
+				TITLE = #{title,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null and content !=''">
+				CONTENT = #{content,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null and state !=''">
+				STATE = #{state,jdbcType=VARCHAR},
+			</if>
+			<if test="browseNum != null and browseNum !=''">
+				BROWSE_NUM = BROWSE_NUM + 1,
+			</if>
+			<if test="supportNum != null and supportNum !=''">
+				SUPPORT_NUM = (select count(ID) from ATTITUDE_USER where RELATION_ID =D.ID and ATTITUDE = 'support' and IS_DELETED='N'),
+			</if>
+			<if test="commentNum != null and commentNum !=''">
+				COMMENT_NUM = (select count(C.ID) from COMMENTS C where C.IS_DELETED = 'N' and C.RELATION_TYPE='zoneDiary' and C.RELATION_ID = #{id,jdbcType=VARCHAR}),
+			</if>
+			<if test="visitPermission != null and visitPermission !=''">
+				VISIT_PERMISSION = #{visitPermission,jdbcType=VARCHAR},
+			</if>
+			<if test="diaryCategory != null and diaryCategory.id != null">
+				DIARY_CATEGORY_ID = #{diaryCategory.id,jdbcType=VARCHAR},
+			</if>
+			<if test="isTop != null and isTop != ''">
+				IS_TOP = #{isTop,jdbcType=VARCHAR},
+			</if>			
+			<if test="isHot != null and isHot != ''">
+				IS_HOT = #{isHot,jdbcType=VARCHAR},
+			</if>
+			<if test="isEssence != null and isEssence != ''">
+				IS_ESSENCE = #{isEssence,jdbcType=VARCHAR},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.diary.entity.Diary">
+		update DIARY
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=DECIMAL}
+		<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+		</if>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	
+	<select id="selectByOp" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+			D.ID,
+			D.TITLE,
+			D.CONTENT,
+			D.STATE,
+			D.BROWSE_NUM,
+			D.SUPPORT_NUM,
+			D.COMMENT_NUM,
+			D.VISIT_PERMISSION,
+			D.DIARY_CATEGORY_ID,
+			D.IS_TOP,
+			D.IS_ESSENCE,
+			D.IS_HOT,
+			D.CREATE_TIME,
+			D.UPDATE_TIME,
+			D.CREATOR			
+		from 
+			DIARY D
+		left join DIARY_CATEGORY DC on DC.ID = D.DIARY_CATEGORY_ID 
+		<if test="diaryCategory != null and diaryCategory != ''">
+			and D.DIARY_CATEGORY_ID = #{diaryCategory,jdbcType=VARCHAR}
+		</if>
+		where D.IS_DELETED = 'N'
+		<if test="creator != null and creator != ''">
+			and D.CREATOR = #{creator,jdbcType=VARCHAR}
+		</if>
+		<if test="visitPermission != null and visitPermission != ''">
+			and D.VISIT_PERMISSION = #{visitPermission,jdbcType=VARCHAR}
+		</if>
+		<if test="id != null and id != ''">
+			<if test="op == 'createTimeGt'.toString()">
+				and D.CREATE_TIME <![CDATA[>]]> (select CREATE_TIME from DIARY where ID = #{id}) ORDER BY D.IS_TOP desc , D.CREATE_TIME 
+			</if>
+			<if test="op == 'createTimeLt'.toString()">
+				and D.CREATE_TIME <![CDATA[<]]> (select CREATE_TIME from DIARY where ID = #{id}) ORDER BY D.IS_TOP desc , D.CREATE_TIME DESC 
+			</if>
+		</if>
+	</select>
+</mapper>

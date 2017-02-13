@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.point.dao.impl.mybatis.PointRecordMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.point.entity.PointRecord">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="POINT_STRATEGY_ID" jdbcType="VARCHAR" property="pointStrategy.id" />
+		<result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+		<result column="RELATION_ID" jdbcType="VARCHAR" property="relationId" />
+		<result column="ENTITY_ID" jdbcType="VARCHAR" property="entityId"/>
+		<result column="CREATOR" jdbcType="VARCHAR" property="creator.id" />
+		<result column="CREATE_TIME" jdbcType="BIGINT" property="createTime" />
+		<result column="POINT" jdbcType="DECIMAL" property="pointStrategy.point" />
+		<result column="SUMMARY" jdbcType="VARCHAR" property="pointStrategy.summary" />
+		<result column="STRATEGY_TYPE" jdbcType="VARCHAR" property="pointStrategy.type" />
+	</resultMap>
+	
+	<resultMap type="com.haoyu.sip.point.utils.UserPointCount" id="UserPointCountResultMap">
+		<id column="USER_ID" jdbcType="VARCHAR" property="user.id" />
+		<result column="POINT" jdbcType="DECIMAL" property="point"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		PR.ID,PR.POINT_STRATEGY_ID,PR.USER_ID,PR.RELATION_ID,PR.ENTITY_ID,PR.CREATOR,PR.CREATE_TIME,PS.POINT,PS.SUMMARY,PS.TYPE STRATEGY_TYPE
+	</sql>
+	
+	<select id="select" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from POINT_RECORD PR
+		join POINT_STRATEGY PS on PS.ID= PR.POINT_STRATEGY_ID
+		<if test="pointStrategyRelationId != null and  pointStrategyRelationId != ''" >
+			and PS.RELATION_ID = #{pointStrategyRelationId,jdbcType=VARCHAR}
+		</if>
+		<if test="pointStrategyId != null and pointStrategyId != ''">
+			and PR.POINT_STRATEGY_ID = #{pointStrategyId,jdbcType=VARCHAR}
+		</if>
+		<if test="pointStrategyIds != null and pointStrategyIds.size > 0">
+			 and PR.POINT_STRATEGY_ID in
+		    <foreach collection="pointStrategyIds" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<if test="pointStrategyTypes != null and pointStrategyTypes.size > 0">
+			 and PS.TYPE in
+		    <foreach collection="pointStrategyTypes" open="(" close=")" item="pointStrategyType" separator=",">
+				#{pointStrategyType}
+			</foreach>
+		</if>
+		where 
+		<choose>
+			<when test="isDeleted != null and isDeleted != ''">
+				PR.IS_DELETED = #{isDeleted,jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				PR.IS_DELETED = 'N'
+			</otherwise>
+		</choose>
+		<if test="relationId != null and relationId !=''">
+			and PR.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="userId != null and userId != ''">
+			and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="entityId != null and entityId != ''">
+			and PR.ENTITY_ID = #{entityId,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from POINT_RECORD PR
+		join POINT_STRATEGY PS on PS.ID= PR.POINT_STRATEGY_ID
+		where PR.IS_DELETED = 'N'
+		and PR.ID = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="insert" parameterType="com.haoyu.sip.point.entity.PointRecord">
+		insert into POINT_RECORD
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="pointStrategy!=null and pointStrategy.id != null">
+				POINT_STRATEGY_ID,
+			</if>
+			<if test="userId != null">
+				USER_ID,
+			</if>
+			<if test="relationId != null">
+				RELATION_ID,
+			</if>
+			<if test="entityId != null">
+				ENTITY_ID,
+			</if>
+			<if test="creator != null and creator.id !=null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="pointStrategy!=null and pointStrategy.id != null">
+				#{pointStrategy.id,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=VARCHAR},
+			</if>
+			<if test="relationId != null">
+				#{relationId,jdbcType=VARCHAR},
+			</if>
+			<if test="entityId != null">
+				#{entityId,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedby != null and updatedby.id != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<insert id="insertIfNotExists" parameterType="com.haoyu.sip.point.entity.PointRecord">
+		insert into POINT_RECORD(ID, POINT_STRATEGY_ID, USER_ID, RELATION_ID, ENTITY_ID, CREATOR, CREATE_TIME, VERSION, IS_DELETED)
+		select #{id,jdbcType=VARCHAR},#{pointStrategy.id,jdbcType=VARCHAR},ID,#{relationId,jdbcType=VARCHAR},#{entityId,jdbcType=VARCHAR},
+		#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=DECIMAL},#{version,jdbcType=DECIMAL},#{isDeleted,jdbcType=CHAR}
+		from BASE_USER_VIEW BUV
+		where BUV.ID = #{userId,jdbcType=VARCHAR} and not exists (select 1 from POINT_RECORD P where P.USER_ID = BUV.ID and IS_DELETED = 'N' and RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		and POINT_STRATEGY_ID = #{pointStrategy.id, jdbcType=VARCHAR} and ENTITY_ID=#{entityId,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="selectUserPointCount" parameterType="map" resultMap="UserPointCountResultMap">
+		select USER_ID,SUM(NUM*PS.POINT) POINT
+		from
+		(select PR.USER_ID,PR.POINT_STRATEGY_ID,count(PR.ID) NUM from POINT_RECORD PR join POINT_STRATEGY PS on PS.ID = PR.POINT_STRATEGY_ID and PS.RELATION_ID = #{pointStrategyRelationId,jdbcType=VARCHAR}
+			where PR.IS_DELETED = 'N'
+			<if test="userId != null and userId != ''">
+				and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="relationId != null and relationId != ''">
+				and PR.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+			</if>
+			<if test="userIds != null">
+				and PR.USER_ID in
+				<foreach collection="userIds" open="(" close=")" item="item" separator=",">
+					#{item,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			group by PR.POINT_STRATEGY_ID,PR.USER_ID) TMP
+		join POINT_STRATEGY PS ON PS.ID = TMP.POINT_STRATEGY_ID
+		and PS.RELATION_ID = #{pointStrategyRelationId,jdbcType=VARCHAR}
+		group by USER_ID
+	</select>
+	
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.point.entity.PointRecord">
+		update POINT_RECORD PR
+		set
+		<if test="updatedby != null and updatedby.id != null">
+			UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+		</if>
+		<if test="updateTime != null">
+			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+		</if>
+		PR.IS_DELETED = 'Y'
+		<trim prefix="where" prefixOverrides="and">
+			<if test="userId != null and userId != ''">
+				and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="pointStrategy != null and pointStrategy.id != null">
+				and PR.POINT_STRATEGY_ID = #{pointStrategy.id,jdbcType=VARCHAR}
+			</if>
+			<if test="relationId != null and relationId != ''">
+				and PR.RELATION_ID = #{relationId, jdbcType=VARCHAR}
+			</if>
+			<if test="entityId != null and entityId != ''">
+				and PR.ENTITY_ID = #{entityId,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</update>
+	
+	<update id="restore" parameterType="com.haoyu.sip.point.entity.PointRecord">
+		update POINT_RECORD PR
+		set
+		<if test="updatedby != null and updatedby.id != null">
+			UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+		</if>
+		<if test="updateTime != null">
+			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+		</if>
+		PR.IS_DELETED = 'N'
+		<trim prefix="where" prefixOverrides="and">
+			<if test="userId != null and userId != ''">
+				and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="pointStrategy != null and pointStrategy.id != null">
+				and PR.POINT_STRATEGY_ID = #{pointStrategy.id,jdbcType=VARCHAR}
+			</if>
+			<if test="relationId != null and relationId != ''">
+				and PR.RELATION_ID = #{relationId, jdbcType=VARCHAR}
+			</if>
+			<if test="entityId != null and entityId != ''">
+				and PR.ENTITY_ID = #{entityId,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</update>
+	
+	<select id="getCount" parameterType="com.haoyu.sip.point.entity.PointRecord" resultType="int">
+		select count(PR.ID)
+		from POINT_RECORD PR
+		join POINT_STRATEGY PS on PS.ID = PR.POINT_STRATEGY_ID
+		where 
+		<choose>
+			<when test="isDeleted != null and isDeleted != ''">
+				PR.IS_DELETED = #{isDeleted,jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				PR.IS_DELETED = 'N'
+			</otherwise>
+		</choose>
+		<if test="pointStrategy != null and  pointStrategy.id != null" >
+			and PR.POINT_STRATEGY_ID = #{pointStrategy.id,jdbcType=VARCHAR}
+		</if>
+		<if test="relationId != null and relationId !=''">
+			and PR.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+		<if test="userId != null and userId != ''">
+			and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+		</if>
+		<if test="entityId != null and entityId != ''">
+			and PR.ENTITY_ID = #{entityId,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<select id="selectUserExpendPoint" parameterType="map" resultMap="UserPointCountResultMap">
+	    select USER_ID,SUM(NUM*PS.POINT) POINT
+		from
+		(select PR.USER_ID,PR.POINT_STRATEGY_ID,count(PR.ID) NUM from POINT_RECORD PR join POINT_STRATEGY PS on PS.ID = PR.POINT_STRATEGY_ID and PS.POINT <![CDATA[ < 0 ]]>  and PS.RELATION_ID = #{pointStrategyRelationId,jdbcType=VARCHAR}
+			where PR.IS_DELETED = 'N'
+			<if test="userId != null and userId != ''">
+				and PR.USER_ID = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="relationId != null and relationId != ''">
+				and PR.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+			</if>
+			group by PR.POINT_STRATEGY_ID,PR.USER_ID) TMP
+		join POINT_STRATEGY PS ON PS.ID = TMP.POINT_STRATEGY_ID
+		and PS.RELATION_ID = #{pointStrategyRelationId,jdbcType=VARCHAR}
+		where 
+			PS.POINT <![CDATA[ < 0 ]]>
+		group by USER_ID
+	</select>
+</mapper>

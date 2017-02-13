@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.dict.dao.impl.mybatis.DictEntryMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.dict.entity.DictEntry">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="DICT_TYPE_CODE" jdbcType="VARCHAR" property="dictTypeCode" />
+		<result column="DICT_VALUE" jdbcType="VARCHAR" property="dictValue" />
+		<result column="DICT_NAME" jdbcType="VARCHAR" property="dictName" />		
+		<result column="PARENT_VALUE" jdbcType="VARCHAR" property="parentValue" />
+		<result column="PARENT_NAME" jdbcType="VARCHAR" property="parentName" />	
+		<!-- 这个先不处理 
+		<result column="RANK" jdbcType="DECIMAL" property="rank" />	-->
+		<result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />	
+		<!-- 数据库中不存在 -->
+		<result column="DICT_TYPE_NAME" jdbcType="VARCHAR" property="dictTypeName" />
+		<result column="PARENT_CODE" jdbcType="VARCHAR" property="parentCode" />	
+	</resultMap>
+	<!-- <resultMap id="dictEntryResult" type="java.util.Map">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="DICT_TYPE_CODE" jdbcType="VARCHAR" property="dictTypeCode" />
+		<result column="DICT_VALUE" jdbcType="VARCHAR" property="dictValue" />
+		<result column="DICT_NAME" jdbcType="VARCHAR" property="dictName" />	
+		<result column="PARENT_VALUE" jdbcType="VARCHAR" property="parentValue" />
+		<result column="PARENT_NAME" jdbcType="VARCHAR" property="parentName" />
+		这个先不处理
+		<result column="RANK" jdbcType="DECIMAL" property="rank" />
+		<result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />
+		数据库中不存在
+		<result column="DICT_TYPE_NAME" jdbcType="VARCHAR" property="dictTypeName" />
+		<result column="PARENT_CODE" jdbcType="VARCHAR" property="parentCode" />
+	</resultMap> -->
+	<sql id="Base_Column_List">
+		ID, DICT_TYPE_CODE, DICT_VALUE, DICT_NAME, PARENT_VALUE, PARENT_NAME, SORT_NO,
+		CREATOR, CREATE_TIME, UPDATEDBY, UPDATE_TIME, IS_DELETED, VERSION
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select 
+		IDE.ID, IDE.DICT_TYPE_CODE, IDE.DICT_VALUE, IDE.DICT_NAME, IDE.PARENT_VALUE, IDE.PARENT_NAME, IDE.SORT_NO, IDE.VERSION,
+		IDT.DICT_TYPE_NAME, IDT.PARENT_CODE
+		from IPANTHER_DICT_ENTRY IDE
+		join IPANTHER_DICT_TYPE IDT
+		on IDT.DICT_TYPE_CODE = IDE.DICT_TYPE_CODE
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<!-- 这个好像没什么用 -->
+	<delete id="deleteByPrimaryKeyPhysics" parameterType="java.lang.String">
+		delete from IPANTHER_DICT_ENTRY
+		where ID = #{id,jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="deleteByDictTypeCodesPhysics" parameterType="java.util.Map">
+		delete from IPANTHER_DICT_ENTRY
+		where 
+		DICT_TYPE_CODE in 
+		<foreach collection="dictTypeCodes" open="(" separator="," close=")" item="item">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteByIdsPhysics" parameterType="java.util.Map">
+		delete from IPANTHER_DICT_ENTRY
+		where ID in
+		<foreach collection="ids" open="(" separator="," close=")" item="item">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	
+	
+	<insert id="insert" parameterType="com.haoyu.dict.entity.DictEntry">
+		insert into IPANTHER_DICT_ENTRY (ID, DICT_TYPE_CODE, DICT_VALUE,
+		DICT_NAME, PARENT_VALUE, PARENT_NAME,SORT_NO,
+		CREATOR,CREATE_TIME, UPDATEDBY, UPDATE_TIME,IS_DELETED, VERSION)
+		values (#{id,jdbcType=VARCHAR}, #{dictTypeCode,jdbcType=VARCHAR}, #{dictValue,jdbcType=VARCHAR},
+		#{dictName,jdbcType=VARCHAR}, #{parentValue,jdbcType=VARCHAR}, #{parentName,jdbcType=VARCHAR},
+		#{sortNo,jdbcType=DECIMAL}, #{creator.id,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP}, #{updatedby.id,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+		#{isDeleted,jdbcType=CHAR}, #{version,jdbcType=DECIMAL})
+	</insert>
+	<insert id="insertSelective" parameterType="com.haoyu.dict.entity.DictEntry">
+		insert into IPANTHER_DICT_ENTRY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="dictTypeCode != null">
+				DICT_TYPE_CODE,
+			</if>
+			<if test="dictValue != null">
+				DICT_VALUE,
+			</if>
+			<if test="dictName != null">
+				DICT_NAME,
+			</if>
+			<if test="parentValue != null">
+				PARENT_VALUE,
+			</if>
+			<if test="parentName != null">
+				PARENT_NAME,
+			</if>
+			<if test="sortNo != null">
+				SORT_NO,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="dictTypeCode != null">
+				#{dictTypeCode,jdbcType=VARCHAR},
+			</if>
+			<if test="dictValue != null">
+				#{dictValue,jdbcType=VARCHAR},
+			</if>
+			<if test="dictName != null">
+				#{dictName,jdbcType=VARCHAR},
+			</if>
+			<if test="parentValue != null">
+				#{parentValue,jdbcType=VARCHAR},
+			</if>
+			<if test="parentName != null">
+				#{parentName,jdbcType=VARCHAR},
+			</if>
+			<if test="sortNo != null">
+				#{sortNo,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.haoyu.dict.entity.DictEntry">
+		update IPANTHER_DICT_ENTRY
+		<set>
+			<if test="dictTypeCode != null">
+				DICT_TYPE_CODE = #{dictTypeCode,jdbcType=VARCHAR},
+			</if>
+			<if test="dictValue != null">
+				DICT_VALUE = #{dictValue,jdbcType=VARCHAR},
+			</if>
+			<if test="dictName != null">
+				DICT_NAME = #{dictName,jdbcType=VARCHAR},
+			</if>
+			<if test="parentValue != null">
+				PARENT_VALUE = #{parentValue,jdbcType=VARCHAR},
+			</if>
+			<if test="parentName != null">
+				PARENT_NAME = #{parentName,jdbcType=VARCHAR},
+			</if>
+			<if test="sortNo != null">
+				SORT_NO = #{sortNo,jdbcType=DECIMAL},
+			</if>
+			<if test="creator != null">
+				CREATOR = #{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED = #{isDeleted,jdbcType=CHAR},
+			</if>
+			<if test="version != null">
+				VERSION = VERSION +1,
+			</if>
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.dict.entity.DictEntry">
+		update IPANTHER_DICT_ENTRY
+		set DICT_TYPE_CODE = #{dictTypeCode,jdbcType=VARCHAR},
+		DICT_VALUE = #{dictValue,jdbcType=VARCHAR},
+		DICT_NAME = #{dictName,jdbcType=VARCHAR},
+		PARENT_VALUE = #{parentValue,jdbcType=VARCHAR},
+		PARENT_NAME = #{parentName,jdbcType=VARCHAR},
+		SORT_NO = #{sortNo,jdbcType=DECIMAL},
+		CREATOR = #{creator.id,jdbcType=VARCHAR},
+		CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+		UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+		UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+		IS_DELETED = #{isDeleted,jdbcType=CHAR},
+		VERSION = #{version,jdbcType=DECIMAL}
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<!-- 这个查询的结果主要是放置在缓存内的  -->
+	<select id="selectByObjectForMap" parameterType="com.haoyu.dict.entity.DictEntry" resultMap="BaseResultMap">
+		select
+		IDE.ID,IDE.DICT_TYPE_CODE, IDE.DICT_VALUE, IDE.DICT_NAME, IDE.PARENT_VALUE, IDE.SORT_NO, IDT.PARENT_CODE
+		from IPANTHER_DICT_ENTRY IDE
+		join IPANTHER_DICT_TYPE IDT
+		on IDT.IS_DELETED = 'N'
+		and IDT.DICT_TYPE_CODE = IDE.DICT_TYPE_CODE
+		where IDE.IS_DELETED = 'N'
+		<if test="dictName != null and dictName != ''">
+			and IDE.DICT_NAME like '%${dictName}%'
+		</if>
+		<if test="dictTypeCode != null and dictTypeCode != ''">
+			and IDE.DICT_TYPE_CODE like '%${dictTypeCode}%'
+		</if>
+	</select>
+	<!-- 合理性检查  在数据插入前或更新前，确保DICT_TYPE_CODE和DICT_VALUE组合唯一  根据返回值再决定是否要插入或更新 -->
+	<select id="checkLogical" parameterType="com.haoyu.dict.entity.DictEntry" resultType="int"> 
+		select count(id)
+		from IPANTHER_DICT_ENTRY IDE
+		where IS_DELETED = 'N'
+		and DICT_TYPE_CODE = #{dictTypeCode, jdbcType=VARCHAR}
+		and DICT_VALUE = #{dictValue, jdbcType=VARCHAR}
+	</select>
+
+	<select id="select" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		IDE.ID,IDE.DICT_TYPE_CODE, IDE.DICT_VALUE, IDE.DICT_NAME, IDE.PARENT_VALUE, IDE.SORT_NO, IDT.PARENT_CODE,IDT.DICT_TYPE_NAME, IDE.CREATE_TIME
+		from IPANTHER_DICT_ENTRY IDE
+		join IPANTHER_DICT_TYPE IDT
+		on IDT.IS_DELETED = 'N'
+		and IDT.DICT_TYPE_CODE = IDE.DICT_TYPE_CODE
+		where IDE.IS_DELETED = 'N'
+		<if test="dictTypeCode != null and dictTypeCode != ''">
+			and IDE.DICT_TYPE_CODE = #{dictTypeCode,jdbcType=VARCHAR}
+		</if>
+		<if test="dictTypeName != null and dictTypeName != ''">
+			and DICT_TYPE_NAME like '%${dictTypeName}%'
+		</if>
+		<if test="parentValue != null and parentValue != ''">
+			and PARENT_VALUE = #{parentValue,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+    <!-- 通过ids查找所有对应的dictTypeCodes -->
+	<select id="selectDictTypeCodesByIds" parameterType="java.util.Map" resultType="String">
+		select distinct DICT_TYPE_CODE
+		from IPANTHER_DICT_ENTRY
+		where ID in
+		<foreach collection="ids" open="(" separator="," close=")" item="item">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</select>
+	
+	<select id="getMaxDictValue" parameterType="com.haoyu.dict.entity.DictEntry" resultType="String">
+		select max(DICT_VALUE)
+		from IPANTHER_DICT_ENTRY
+		where IS_DELETED = 'N'
+		<if test="dictTypeCode != null and dictTypeCode != ''">
+			and DICT_TYPE_CODE = #{dictTypeCode}
+		</if>
+	</select>
+</mapper>

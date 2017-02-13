@@ -1,0 +1,4 @@
+com\haoyu\sip\textbook\mobile\service\IMTextBookService.class
+com\haoyu\sip\textbook\mobile\controller\MTextBookController.class
+com\haoyu\sip\textbook\mobile\service\impl\MTextBookServiceImpl.class
+com\haoyu\sip\textbook\mobile\entity\MTextBookEntry.class

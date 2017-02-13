@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.file.dao.impl.mybatis.FileDownloadUserMapper">
+	<insert id="insert" parameterType="com.haoyu.sip.file.entity.FileDownloadUser">
+		insert into FILE_DOWNLOAD_USER(ID,FILE_ID, CREATOR, CREATE_TIME, UPDATEDBY, UPDATE_TIME, IS_DELETED, VERSION)
+		values(#{id,jdbcType=VARCHAR},#{fileId,jdbcType=VARCHAR},
+		#{creator.id,jdbcType=VARCHAR}, #{createTime,jdbcType=INTEGER}, #{updatedby.id,jdbcType=VARCHAR},
+		#{updateTime,jdbcType=INTEGER}, #{isDeleted,jdbcType=CHAR}, #{version,jdbcType=INTEGER})
+	</insert>
+</mapper>

@@ -1,0 +1,96 @@
+----------------------------------------------------------------
+Sun Oct 09 16:35:52 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance a816c00e-0157-a895-818c-0000054eb168 
+on database directory D:\repo\version\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:53 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 888c4022-0157-a895-818c-0000054eb168 
+on database directory D:\repo\workspaces\default\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:54 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 6965c036-0157-a895-818c-0000054eb168 
+on database directory D:\repo\workspaces\security\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:55 GMT+08:00 2016:
+Shutting down instance 888c4022-0157-a895-818c-0000054eb168 on database directory D:\repo\workspaces\default\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+----------------------------------------------------------------
+Sun Oct 09 16:35:55 GMT+08:00 2016:
+Shutting down instance 6965c036-0157-a895-818c-0000054eb168 on database directory D:\repo\workspaces\security\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+----------------------------------------------------------------
+Sun Oct 09 16:35:55 GMT+08:00 2016:
+Shutting down instance a816c00e-0157-a895-818c-0000054eb168 on database directory D:\repo\version\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+----------------------------------------------------------------
+Sun Oct 09 16:35:55 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 4aa3404a-0157-a895-818c-0000054eb168 
+on database directory D:\repo\version\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:56 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 2c44c05e-0157-a895-818c-0000054eb168 
+on database directory D:\repo\workspaces\default\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:56 GMT+08:00 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 0e4a4072-0157-a895-818c-0000054eb168 
+on database directory D:\repo\workspaces\security\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+Loaded from file:/D:/isumi/apache-maven-3.2.3/repository/org/apache/derby/derby/10.10.2.0/derby-10.10.2.0.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_31-b13
+user.dir=E:\workshopspace\base\sip\sip-modules\sip-jcr
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Oct 09 16:35:56 GMT+08:00 2016:
+Shutting down instance 2c44c05e-0157-a895-818c-0000054eb168 on database directory D:\repo\workspaces\default\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+----------------------------------------------------------------
+Sun Oct 09 16:35:56 GMT+08:00 2016:
+Shutting down instance 0e4a4072-0157-a895-818c-0000054eb168 on database directory D:\repo\workspaces\security\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 
+----------------------------------------------------------------
+Sun Oct 09 16:35:57 GMT+08:00 2016:
+Shutting down instance 4aa3404a-0157-a895-818c-0000054eb168 on database directory D:\repo\version\db with class loader sun.misc.Launcher$AppClassLoader@6bc7c054 

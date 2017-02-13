@@ -1,0 +1,5 @@
+com\haoyu\sip\attitude\mobile\service\impl\MAttitudeService.class
+com\haoyu\sip\attitude\mobile\controller\MAttitudeController.class
+com\haoyu\sip\attitude\mobile\entity\MAttitudeStat.class
+com\haoyu\sip\attitude\mobile\entity\MAttitudeUser.class
+com\haoyu\sip\attitude\mobile\service\IMAttitudeService.class

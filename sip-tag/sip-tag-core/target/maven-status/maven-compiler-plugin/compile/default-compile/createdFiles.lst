@@ -1,0 +1,10 @@
+com\haoyu\sip\tag\entity\Tag.class
+com\haoyu\sip\tag\dao\ITagRelationDao.class
+com\haoyu\sip\tag\dao\ITagDao.class
+com\haoyu\sip\tag\service\impl\TagServiceImpl.class
+com\haoyu\sip\tag\service\ITagRelationService.class
+com\haoyu\sip\tag\entity\TagRelation.class
+com\haoyu\sip\tag\dao\impl\mybatis\TagDao.class
+com\haoyu\sip\tag\service\impl\TagRelationServiceImpl.class
+com\haoyu\sip\tag\dao\impl\mybatis\TagRelationDao.class
+com\haoyu\sip\tag\service\ITagService.class

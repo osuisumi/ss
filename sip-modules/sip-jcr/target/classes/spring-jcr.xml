@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/util 
+                        http://www.springframework.org/schema/util/spring-util.xsd
+                        http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Register Annotation-based Post Processing Beans -->
+	<context:annotation-config />
+
+	<!-- Scan context package for any eligible annotation configured beans. -->
+	<context:component-scan
+		base-package="com.haoyu.sip.cms.article.dao.impl.ArticleDaoImpl" />
+	<context:component-scan
+		base-package="com.haoyu.sip.cms.catalog.dao.impl.CatalogDaoImpl" />
+
+
+	<!-- normal repository -->
+	<bean id="repository"
+		class="org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean">
+		<!-- normal factory beans params -->
+		<property name="configuration" value="classpath:/repository.xml" />
+		<!-- use the target folder which will be cleaned -->
+		<property name="homeDir" value="file:D:/repo" />
+	</bean>
+
+	<bean id="password" class="java.lang.String">
+		<constructor-arg index="0" value="admin" />
+	</bean>
+
+	<bean id="jcrSessionFactory"
+		class="org.springframework.extensions.jcr.jackrabbit.ocm.OcmJackrabbitSessionFactory"
+		p:repository-ref="repository">
+		<property name="credentials">
+			<bean class="javax.jcr.SimpleCredentials">
+				<constructor-arg value="admin" />
+				<constructor-arg index="1">
+					<bean factory-bean="password" factory-method="toCharArray" />
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="contentType" value="text/x-jcr-cnd" />
+ 		<property name="nodeDefinitions">
+			<array>
+				<value>classpath:node-types.cnd</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="jcrTemplate" class="org.springframework.extensions.jcr.JcrTemplate">
+		<property name="sessionFactory" ref="jcrSessionFactory" />
+		<property name="allowCreate" value="true" />
+	</bean>
+
+
+	<!-- <bean id="processor" class="org.springframework.extensions.jcr.JcrContentExporter"> 
+		<property name="contentRecurser" ref="jcrContentRecurser" /> <property name="rootFolder" 
+		value="./target/repo_export" /> </bean> -->
+
+	<!-- Transaction Configuration - Required for OCM -->
+	<bean id="jcrTransactionManager"
+		class="org.springframework.extensions.jcr.jackrabbit.LocalTransactionManager">
+		<property name="sessionFactory" ref="jcrSessionFactory" />
+	</bean>
+	<bean id="txProxyTemplate" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="proxyTargetClass" value="true" />
+		<property name="transactionManager" ref="jcrTransactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="testInsertPerson">PROPAGATION_REQUIRED</prop>
+				<prop key="testAddNode*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="*">PROPAGATION_REQUIRED,
+					readOnly
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<util:list id="annotatedClassNames">
+		<value>com.haoyu.sip.cms.article.entity.Article</value>
+		<value>com.haoyu.sip.cms.catalog.entity.Catalog</value>
+	</util:list>
+
+
+
+	<bean id="jcrMapper"
+		class="org.apache.jackrabbit.ocm.mapper.impl.annotation.AnnotationMapperImpl">
+		<constructor-arg index="0" ref="annotatedClassNames" />
+	</bean>
+
+	<bean id="jcrMappingTemplate"
+		class="org.springframework.extensions.jcr.jackrabbit.ocm.JcrMappingTemplate">
+		<property name="sessionFactory" ref="jcrSessionFactory" />
+		<property name="mapper" ref="jcrMapper" />
+		<property name="allowCreate" value="true" />
+	</bean>
+
+	<!-- <bean id="personDAO" class="org.springbyeSmple.jcr.PersonDAO"> <property 
+		name="jcrMappingTemplate" ref="jcrMappingTemplate" /> </bean> -->
+
+	<bean id="jcrDao" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.haoyu.sip.jcr.dao.JcrDao">
+				<property name="template" ref="jcrMappingTemplate" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="articleDaoImpl" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.haoyu.sip.cms.article.dao.impl.ArticleDaoImpl">
+				<property name="template" ref="jcrMappingTemplate" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="catalogDaoImpl" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.haoyu.sip.cms.catalog.dao.impl.CatalogDaoImpl">
+				<property name="template" ref="jcrMappingTemplate" />
+			</bean>
+		</property>
+	</bean>
+
+
+
+	<!-- JTA transactional advice (what 'happens') -->
+	<!-- <tx:advice id="txAdviceJCA" transaction-manager="jcrTransactionManager"> 
+		<tx:attributes> All methods starting with 'get', 'has' and 'validate' are 
+		read-only <tx:method name="testQuery*" read-only="true" /> <tx:method name="testAddNode*" 
+		read-only="false" /> <tx:method name="save*" read-only="false" /> <tx:method 
+		name="testInsertPerson" read-only="false" /> Other methods use the default 
+		transaction settings (see below) <tx:method name="*" rollback-for="java.lang.Exception" 
+		/> </tx:attributes> </tx:advice> -->
+
+	<!-- AOP. Ensure that the above transactional advice runs for any execution 
+		of an operation defined in the com.jetsonsys.plm.cms package -->
+	<!-- <aop:config> <aop:pointcut id="plmRepositoryServiceOperation" expression="execution(* 
+		org.springbyexample.jcr.*DAO.*(..))" /> <aop:advisor advice-ref="txAdviceJCA" 
+		pointcut-ref="plmRepositoryServiceOperation" /> </aop:config> -->
+
+</beans>

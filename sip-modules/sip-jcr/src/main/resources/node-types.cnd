@@ -1,0 +1,47 @@
+<jcr='http://www.jcp.org/jcr/1.0'>
+<nt='http://www.jcp.org/jcr/nt/1.0'>
+<mix='http://www.jcp.org/jcr/mix/1.0'>
+<cms = 'http://kartashov.com/jackrabbit-cookbook'>
+
+[cms:catalog] > cms:jcrEntity,mix:referenceable
+	- cms:name (string) mandatory 
+	- cms:alias (string) mandatory protected 
+	- cms:isDeleted  (string) mandatory 
+	- cms:des (string) version 
+	- cms:url (URI) 
+	- cms:path (PATH) 
+	- cms:showChild (reference) 
+	- cms:parent(reference) 
+	
+[cms:jcrEntity] > nt:base 
+primaryitem cms:id
+	- cms:id (string) mandatory protected 
+	- cms:creator = cms:commonUser
+	- cms:updatedby = cms:commonUser
+	- cms:createTime (long) mandatory protected version
+	- cms:updateTime (long) 
+	
+[cms:commonUser] > cms:user,mix:referenceable
+	
+	
+[cms:user] > nt:base
+    - cms:id (string) mandatory protected version
+    - cms:realName (string) mandatory version
+    - cms:avatar (string)
+    
+[cms:article] > cms:jcrEntity
+mixin
+	- cms:title (string) mandatory 
+	- cms:subtitle (string) 
+	- cms:content (string) 
+	- cms:isPublish (string) mandatory
+	- cms:isDeleted (string) mandatory
+	- cms:browseNumber (long) mandatory
+	- cms:url (URI) mandatory
+	- cms:publisher = cms:commonUser
+	- cms:publishTime (long) 
+	- cms:catalog = cms:catalog
+	
+	
+	
+	

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.cms.teacher.dao.impl.mybatis.TeacherMapper" >
+  <resultMap id="TeacherResultMap" type="com.haoyu.sip.cms.teacher.entity.Teacher" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="FULL_NAME" property="fullName" jdbcType="VARCHAR" />
+    <result column="AVATAR" property="avatar" jdbcType="VARCHAR" />
+    <result column="EDU_BACKGROUND" property="eduBackground" jdbcType="VARCHAR" />
+    <result column="JOB_TITLE" property="jobTitle" jdbcType="VARCHAR" />
+    <result column="POSITION" property="position" jdbcType="VARCHAR" />
+    <result column="ID_NO" property="idNo" jdbcType="VARCHAR" />
+    <result column="PERSONAL_PROFILE" property="personalProfile" jdbcType="VARCHAR" />
+   	<result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID, M.FULL_NAME,M.AVATAR,M.ID_NO,M.EDU_BACKGROUND,M.JOB_TITLE,M.POSITION,M.PERSONAL_PROFILE,M.CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="TeacherResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_TEACHER M
+    where M.IS_DELETED='N'
+    and M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="TeacherResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+    from CMS_TEACHER M
+    where M.IS_DELETED='N'
+    <if test="fullName!=null and fullName!=''">
+    	<bind name="pattern" value="'%' + fullName + '%'" />
+    	and M.FULL_NAME LIKE #{pattern}
+    </if>
+    <if test="idNo!=null and idNo!=''">
+    	and M.ID_NO=#{idNo,jdbcType=VARCHAR}
+    </if>
+    <if test="relationId!=null and relationId!=''">
+    	and EXISTS(SELECT 1 FROM CMS_TEACHER_RELATION CTR WHERE CTR.TEACHER_ID=M.ID AND CTR.RELATION_ID=#{relationId,jdbcType=VARCHAR} AND IS_DELETED='N')
+    </if>
+    <if test="relationIds!=null">
+    	and EXISTS(SELECT 1 FROM CMS_TEACHER_RELATION CTR WHERE CTR.TEACHER_ID=M.ID 
+    	AND CTR.RELATION_ID IN
+    	<foreach collection="relationIds" item="relationId" separator="," open="(" close=")">
+    		#{relationId,jdbcType=VARCHAR} 
+    	</foreach>
+    	AND IS_DELETED='N')    	
+    </if>
+    ORDER BY ORDER_NO,CREATE_TIME DESC
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.cms.teacher.entity.Teacher">
+  	insert into CMS_TEACHER(ID,AVATAR,FULL_NAME,ID_NO,EDU_BACKGROUND,JOB_TITLE,POSITION,PERSONAL_PROFILE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR},#{fullName,jdbcType=VARCHAR},#{idNo,jdbcType=VARCHAR},#{eduBackground,jdbcType=VARCHAR},#{jobTitle,jdbcType=VARCHAR},
+  	#{position,jdbcType=VARCHAR},#{personalProfile,jdbcType=VARCHAR},#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.cms.teacher.entity.Teacher">
+  	update CMS_TEACHER
+  	<set >
+      <if test="fullName != null and fullName!=''" >
+        FULL_NAME = #{fullName,jdbcType=VARCHAR},
+      </if>
+        AVATAR = #{avatar,jdbcType=VARCHAR},
+        EDU_BACKGROUND = #{eduBackground,jdbcType=VARCHAR},
+        JOB_TITLE = #{jobTitle,jdbcType=VARCHAR},
+        POSITION = #{position,jdbcType=VARCHAR},
+        PERSONAL_PROFILE = #{personalProfile,jdbcType=VARCHAR},
+	  <if test="idNo != null and idNo!=''" >
+        ID_NO = #{idNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null and orderNo!=''" >
+        ORDER_NO = #{orderNo,jdbcType=INTEGER},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete CMS_TEACHER
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.cms.teacher.entity.Teacher">
+  	  update CMS_TEACHER
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where ID=#{id,jdbcType=VARCHAR}	
+  </update>
+</mapper>

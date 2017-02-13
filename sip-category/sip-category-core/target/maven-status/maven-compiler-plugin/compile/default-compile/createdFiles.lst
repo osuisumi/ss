@@ -1,0 +1,10 @@
+com\haoyu\sip\category\service\impl\CategoryRelationSercviceImpl.class
+com\haoyu\sip\category\dao\impl\mybatis\CategoryDao.class
+com\haoyu\sip\category\entity\CategoryRelation.class
+com\haoyu\sip\category\service\ICategoryRelationService.class
+com\haoyu\sip\category\service\impl\CategoryServiceImpl.class
+com\haoyu\sip\category\dao\ICategoryRelationDao.class
+com\haoyu\sip\category\entity\Category.class
+com\haoyu\sip\category\service\ICategoryService.class
+com\haoyu\sip\category\dao\ICategoryDao.class
+com\haoyu\sip\category\dao\impl\mybatis\CategoryRelationDao.class

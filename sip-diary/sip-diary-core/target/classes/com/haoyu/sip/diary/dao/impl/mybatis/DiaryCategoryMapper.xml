@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.diary.dao.impl.mybatis.DiaryCategoryMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.diary.entity.DiaryCategory">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<collection property="diaries" ofType="com.haoyu.sip.diary.entity.Diary">
+			<id property="id" column="DIARY_ID"/>
+	    	<result property="title" column="TITLE" jdbcType="VARCHAR"/>
+	    	<result property="content" column="CONTENT" jdbcType="VARCHAR"/>
+	    	<result property="state" column="DIARY_STATE" jdbcType="VARCHAR"/>
+	    	<result property="browse_num" column="BROWSE_NUM" jdbcType="DECIMAL"/>
+	    	<result property="support_num" column="SUPPORT_NUM" jdbcType="DECIMAL"/>
+	    	<result property="comment_num" column="COMMENT_NUM" jdbcType="DECIMAL"/>
+	    	<result property="visit_permission" column="VISIT_PERMISSION" jdbcType="VARCHAR"/>
+		</collection>
+	</resultMap>
+	<select id="select" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+			DC.ID,
+			DC.NAME,
+			DC.STATE,
+			D.ID DIARY_ID,
+			D.TITLE,
+			D.CONTENT,
+			D.STATE DIARY_STATE,
+			D.BROWSE_NUM,
+			D.SUPPORT_NUM,
+			D.COMMENT_NUM,
+			D.VISIT_PERMISSION			
+		from 
+			DIARY_CATEGORY DC
+		left join DIARY D on DC.id = D.DIARY_CATEGORY_ID on D.IS_DELETED = 'N'
+		where 
+			DC.IS_DELETED = 'N'
+		<if test="creator != null and creator != ''">
+			and DC.CREATOR = #{creator}
+		</if>
+		<if test="name != null and name != ''">
+			and DC.NAME like '%${name}%'
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+			DC.ID,
+			DC.NAME,
+			DC.STATE
+		from
+			DIARY_CATEGORY DC
+		where DC.IS_DELETED = 'N'
+			and  DC.ID = #{id,jdbcType=VARCHAR} 
+	</select>
+	<insert id="insert" parameterType="com.haoyu.sip.diary.entity.DiaryCategory">
+		insert into DIARY_CATEGORY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="creator != null">
+				CREATOR,
+			</if>
+			<if test="creator != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=VARCHAR},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.haoyu.sip.diary.entity.DiaryCategory">
+		update DIARY_CATEGORY
+		<set>
+			<if test="name != null and name !=''">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null and state !=''">
+				STATE = #{state,jdbcType=VARCHAR},
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+			</if>
+			VERSION = VERSION+1
+		</set>
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteByLogic" parameterType="com.haoyu.sip.diary.entity.Diary">
+		update DIARY_CATEGORY
+		set IS_DELETED = 'Y', UPDATE_TIME = #{updateTime,jdbcType=DECIMAL}
+		<if test="updatedby != null and updatedby.id != null and updatedby.id != ''">
+			,UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR}
+		</if>
+		,VERSION = VERSION + 1
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

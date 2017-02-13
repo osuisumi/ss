@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.gallery.dao.impl.mybatis.PhotoMapper" >
+  <resultMap id="PhotoResultMap" type="com.haoyu.sip.gallery.entity.Photo" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ORDER_NO" property="orderNo" jdbcType="VARCHAR" />
+    <result column="STATE" property="state" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="BIGINT" />
+    <result column="CREATOR" property="creator.id" jdbcType="VARCHAR"></result>
+    <association property="fileInfo" javaType="com.haoyu.sip.file.entity.FileInfo">
+    	<id column="FILE_INFO_ID" property="id"/>
+    	<result column="URL" property="url"/>
+    	<result column="FILE_NAME" property="fileName"/>
+    </association>
+    <collection property="photoGalleries" ofType="com.haoyu.sip.gallery.entity.PhotoGallery">
+    	<id column="PHOTO_GALLERY_ID" property="id"/>
+    	<result column="PHOTO_GALLERY_NAME" property="name" jdbcType="VARCHAR" />
+    </collection>
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    P.ID,P.NAME,P.DESCRIPTION,P.ORDER_NO,P.STATE,P.CREATE_TIME,P.CREATOR,PG.ID PHOTO_GALLERY_ID,PG.NAME PHOTO_GALLERY_NAME,FI.ID FILE_INFO_ID,FI.URL,FI.FILE_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="PhotoResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from PHOTO P
+    join PHOTO_GALLERY_PHOTO GPG
+    on P.ID = GPG.PHOTO_ID
+    join PHOTO_GALLERY PG
+    ON PG.ID=GPG.PHOTO_GALLERY_ID
+    join FILE_RELATION FR
+    ON FR.RELATION_ID=P.ID
+    join FILE_INFO FI
+    on FI.ID=FR.FILE_ID
+    where PG.IS_DELETED='N'
+    AND P.IS_DELETED='N'
+    and P.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByParameter" resultMap="PhotoResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List"/>
+ 	from PHOTO P
+    join PHOTO_GALLERY_PHOTO GPG
+    on P.ID = GPG.PHOTO_ID
+    join PHOTO_GALLERY PG
+    ON PG.ID=GPG.PHOTO_GALLERY_ID
+    join FILE_RELATION FR
+    ON FR.RELATION_ID=P.ID
+    join FILE_INFO FI
+    on FI.ID=FR.FILE_ID
+    where P.IS_DELETED='N'
+    <if test="galleryId!=null and galleryId!=''">
+    	and PG.ID=#{galleryId,jdbcType=VARCHAR}
+    </if>
+    <if test="ids != null">
+    	and P.ID in
+    	<foreach collection="ids" open="(" close=")" item="item" separator=",">
+    		#{item,jdbcType=VARCHAR}
+    	</foreach>
+    </if>
+    <if test="id != null and id != ''">
+    	and P.ID = #{id,jdbcType=VARCHAR}
+    </if>
+    order by P.ORDER_NO
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.gallery.entity.Photo">
+  	insert into PHOTO(ID,NAME,DESCRIPTION,ORDER_NO,STATE,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	values(#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{description,jdbcType=VARCHAR},#{orderNo,jdbcType=INTEGER},#{state,jdbcType=VARCHAR},
+  	#{creator.id,jdbcType=VARCHAR},#{createTime,jdbcType=BIGINT},#{isDeleted,jdbcType=VARCHAR},#{version,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.gallery.entity.Photo">
+  	update PHOTO
+  	<set >
+      <if test="name != null and name!=''" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+       <if test="description != null and description!=''" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null" >
+        ORDER_NO = #{orderNo,jdbcType=INTEGER},
+      </if>
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+      VERSION = VERSION+1
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="java.lang.String">
+  	delete PHOTO
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.gallery.entity.Photo">
+  	  update PHOTO
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		ID IN
+      		(
+      			SELECT PHOTO_ID FROM PHOTO_GALLERY_PHOTO GPG 
+      			WHERE GPG.GALLERY_ID IN
+				<foreach collection="photoGalleries" item="gallery" separator="," open="(" close=")">
+					#{gallery.id,jdbcType=VARCHAR}
+				</foreach>      		
+      		)
+      	</otherwise>
+      </choose>
+  </update>
+  
+  <update id="deletePhotosByLogic" parameterType="java.util.List">
+  	update PHOTO
+  	set IS_DELETED='Y'
+  	where ID in
+  	<foreach collection="list" open="(" close=")" item="id" separator=",">
+  		#{id,jdbcType=VARCHAR}
+  	</foreach>
+  </update>
+</mapper>

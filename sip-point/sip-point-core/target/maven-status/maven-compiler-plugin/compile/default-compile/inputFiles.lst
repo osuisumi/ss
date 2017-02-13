@@ -1,0 +1,17 @@
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\template\PointStrategysDirective.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\dao\impl\mybatis\PointStrategyDao.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\dao\IPointRecordDao.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\service\impl\PointStrategyService.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\event\CreatePointRecordEvent.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\dao\IPointStrategyDao.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\event\ChangePointRecordEvent.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\service\IPointStrategyService.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\dao\impl\mybatis\PointRecordDao.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\service\IPointRecordService.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\template\PointRecordsDataDirective.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\utils\UserPointCount.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\entity\PointStrategy.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\service\impl\PointRecordService.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\template\PointStrategyDataDirective.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\entity\PointRecord.java
+E:\workshopspace\base\sip\sip-point\sip-point-core\src\main\java\com\haoyu\sip\point\event\DeletePointRecordEvent.java

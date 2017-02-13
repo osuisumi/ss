@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.point.dao.impl.mybatis.PointStrategyMapper">
+	<resultMap id="BaseResultMap" type="com.haoyu.sip.point.entity.PointStrategy">
+		<result column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="POINT" jdbcType="DECIMAL" property="point" />
+		<result column="SUMMARY" jdbcType="VARCHAR" property="summary" />
+		<result column="TYPE" jdbcType="VARCHAR" property="type" />
+		<result column="RELATION_ID" jdbcType="VARCHAR" property="relationId"/>
+		<result column="CREATOR" jdbcType="VARCHAR" property="creator.id" />
+		<result column="CREATE_TIME" jdbcType="BIGINT" property="createTime" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, POINT, SUMMARY, TYPE, RELATION_ID,CREATOR, CREATE_TIME, UPDATEDBY, UPDATE_TIME,
+		VERSION, IS_DELETED
+	</sql>
+	<select id="select" resultMap="BaseResultMap" parameterType="map">
+		select <include refid="Base_Column_List" />
+		from POINT_STRATEGY PS 
+		where PS.IS_DELETED = 'N'
+		<if test="type != null and type != ''">
+			and PS.TYPE = #{type,jdbcType=VARCHAR}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			and PS.RELATION_ID = #{relationId,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="map">
+		select <include refid="Base_Column_List" />
+		from POINT_STRATEGY PS
+		where PS.IS_DELETED = 'N'
+		and PS.ID = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="insert" parameterType="com.haoyu.sip.point.entity.PointStrategy">
+		insert into POINT_STRATEGY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="point != null">
+				POINT,
+			</if>
+			<if test="summary != null">
+				SUMMARY,
+			</if>
+			<if test="type != null">
+				TYPE,
+			</if>
+			<if test="relationId != null">
+				RELATION_ID,
+			</if>
+			<if test="creator != null and creator.id != null">
+				CREATOR,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updatedby != null">
+				UPDATEDBY,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="version != null">
+				VERSION,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="point != null">
+				#{point,jdbcType=DECIMAL},
+			</if>
+			<if test="summary != null">
+				#{summary,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="relationId != null">
+				#{relationId,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null and creator.id != null">
+				#{creator.id,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=BIGINT},
+			</if>
+			<if test="updatedby != null">
+				#{updatedby,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=BIGINT},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=DECIMAL},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+</mapper>

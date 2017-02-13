@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.auth.dao.impl.mybatis.AuthRolePermissionMapper" >
+  <insert id="insertByPermissionRoles" parameterType="java.util.Map">
+  	insert into AUTH_ROLE_PERMISSION(PERMISSION_ID,ROLE_ID)
+	select #{permission.id,jdbcType=VARCHAR},ID
+	from ROLE R
+	where ID IN
+	<foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+		#{roleId,jdbcType=VARCHAR}
+	</foreach>
+	AND IS_DELETED='N'
+  </insert>
+  <insert id="insertByRolePermissions" parameterType="java.util.Map">
+  	insert into AUTH_ROLE_PERMISSION(PERMISSION_ID,ROLE_ID)
+	select ID,#{role.id,jdbcType=VARCHAR}
+	from AUTH_PERMISSION P
+	where ID IN
+	<foreach collection="permissionIds" item="permissionId" separator="," open="(" close=")">
+		#{permissionId,jdbcType=VARCHAR}
+	</foreach>
+	AND IS_DELETED='N'
+	AND NOT EXISTS(SELECT 1 FROM AUTH_ROLE_PERMISSION AMR WHERE AMR.ROLE_ID=#{role.id,jdbcType=VARCHAR} and AMR.PERMISSION_ID=P.ID)
+  </insert>
+  <delete id="deleteByPhysics" parameterType="java.util.Map">
+  	delete from AUTH_ROLE_PERMISSION
+    <where>
+	    <if test="permission!=null">
+	    	AND PERMISSION_ID=#{permission.id,jdbcType=VARCHAR}
+	    </if>
+	    <if test="role!=null">
+	    	AND ROLE_ID=#{role.id,jdbcType=VARCHAR}
+	    </if>
+	    <if test="permissionIds!=null and permissionIds.size()>0">
+	    	AND PERMISSION_ID IN
+	    	<foreach collection="permissionIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+	    <if test="roleIds!=null and roleIds.size()>0">
+	    	AND ROLE_ID IN
+	    	<foreach collection="roleIds" item="id" separator="," open="(" close=")">
+	    		#{id,jdbcType=VARCHAR}
+	    	</foreach>
+	    </if>
+    </where>
+  </delete>
+</mapper>

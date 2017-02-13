@@ -1,0 +1,5 @@
+com\haoyu\sip\note\dao\impl\mybatis\NoteDao.class
+com\haoyu\sip\note\dao\INoteDao.class
+com\haoyu\sip\note\service\impl\NoteServiceImpl.class
+com\haoyu\sip\note\entity\Note.class
+com\haoyu\sip\note\service\INoteService.class

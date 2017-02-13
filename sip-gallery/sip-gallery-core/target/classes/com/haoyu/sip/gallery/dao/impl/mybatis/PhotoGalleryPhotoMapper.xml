@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.gallery.dao.impl.mybatis.PhotoGalleryPhotoMapper" >
+    <insert id="insertByPhotoGallery" parameterType="java.util.Map">
+  	insert into PHOTO_GALLERY_PHOTO(ID,PHOTO_ID,PHOTO_GALLERY_ID,CREATOR,CREATE_TIME,IS_DELETED,VERSION)
+  	select ${uuid},ID,#{photoGallery.id,jdbcType=VARCHAR},#{photoGallery.creator.id,jdbcType=VARCHAR},#{photoGallery.createTime,jdbcType=BIGINT},#{photoGallery.isDeleted,jdbcType=VARCHAR},#{photoGallery.version,jdbcType=DECIMAL}
+  	from PHOTO PG
+  	WHERE ID
+  	IN
+  	<foreach collection="photoGallery.photos" item="photo" separator="," open="(" close=")">
+		#{photo.id,jdbcType=VARCHAR}
+	</foreach>    
+  	AND NOT EXISTS(select 1 from PHOTO_GALLERY_PHOTO PGP WHERE PGP.PHOTO_ID=PG.ID AND PGP.PHOTO_GALLERY_ID=#{id,jdbcType=VARCHAR} AND PGP.IS_DELETED='N')
+  </insert>
+  <update id="deleteByLogic" parameterType="com.haoyu.sip.gallery.entity.PhotoGallery">
+  	  update PHOTO_GALLERY_PHOTO
+  	  set IS_DELETED='Y',
+      <if test="updatedby != null" >
+        UPDATEDBY = #{updatedby.id,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=BIGINT},
+      </if>
+       VERSION=VERSION+1
+      where 
+      <choose>
+      	<when test="id!=null and id!=''">
+      		PHOTO_GALLERY_ID=#{id,jdbcType=VARCHAR}
+      	</when>
+      	<otherwise>
+      		PHOTO_ID IN
+      		<foreach collection="photos" item="photo" separator="," open="(" close=")">
+					#{photo.id,jdbcType=VARCHAR}
+			</foreach>      		
+      	</otherwise>
+      </choose>
+  </update>
+  
+  <update id="movePhotos" parameterType="map">
+  	update PHOTO_GALLERY_PHOTO
+  	set PHOTO_GALLERY_ID = #{to,jdbcType=VARCHAR}
+  	where PHOTO_GALLERY_ID = #{from,jdbcType=VARCHAR}
+  	and PHOTO_ID in 
+  	<foreach collection="photoIds" open="(" close=")" item="photoId" separator=",">
+  		#{photoId,jdbcType=VARCHAR}
+  	</foreach>
+  </update>
+  
+  <update id="deleteByGalleryIdAndPhotoIds" parameterType="map">
+  	update PHOTO_GALLERY_PHOTO
+  	set IS_DELETED = 'Y'
+  	where PHOTO_ID in
+  	<foreach collection="photoIds" open="(" close=")" item="photoId" separator=",">
+  		#{photoId,jdbcType=VARCHAR}
+  	</foreach>
+  	and PHOTO_GALLERY_ID = #{galleryId,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="deleteByGalleryId" parameterType="java.lang.String">
+  	delete from PHOTO_GALLERY_PHOTO
+  	where PHOTO_GALLERY_ID = #{galleryId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

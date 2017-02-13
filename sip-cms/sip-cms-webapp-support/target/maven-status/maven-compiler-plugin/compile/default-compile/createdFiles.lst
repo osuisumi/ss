@@ -1,0 +1,13 @@
+com\haoyu\sip\cms\resource\controller\ResourceController.class
+com\haoyu\sip\cms\banner\controller\BannerController.class
+com\haoyu\sip\cms\template\controller\TemplateFileController.class
+com\haoyu\sip\cms\article\controller\ArticleController.class
+com\haoyu\sip\cms\links\controller\LinksController.class
+com\haoyu\sip\cms\channel\controller\ChannelController.class
+com\haoyu\sip\cms\siteinfo\controller\SiteInfoController.class
+com\haoyu\sip\cms\recommend\controller\RecommendController.class
+com\haoyu\sip\cms\teacher\controller\TeacherController.class
+com\haoyu\sip\cms\web\AdminController.class
+com\haoyu\sip\cms\web\CmsController.class
+com\haoyu\sip\cms\links\controller\LinksTypeController.class
+com\haoyu\sip\cms\magazine\controller\MagazineController.class

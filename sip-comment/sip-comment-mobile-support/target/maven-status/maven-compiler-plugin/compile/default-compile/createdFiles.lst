@@ -1,0 +1,4 @@
+com\haoyu\sip\comment\mobile\controller\MCommentController.class
+com\haoyu\sip\comment\mobile\entity\MComment.class
+com\haoyu\sip\comment\mobile\service\IMCommentService.class
+com\haoyu\sip\comment\mobile\service\impl\MCommentServiceImpl.class

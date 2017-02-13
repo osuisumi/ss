@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.haoyu.sip.textbook.dao.impl.mybatis.TextBookRelationMapper">
+
+	<resultMap type="com.haoyu.sip.textbook.entity.TextBookRelation" id="TextBookRelationResult">
+		<id column="ID" property="id" />
+		<result column="TEXT_BOOK_TYPE_CODE" property="textBookTypeCode" jdbcType="VARCHAR" />
+		<result column="TEXT_BOOK_ENTRY_ID" property="textBookEntryId" jdbcType="VARCHAR" />
+		<result column="PARENT_CODE" property="parentCode" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="INTEGER" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="INTEGER" />
+		<result column="UPDATEBY" property="updateBy" jdbcType="VARCHAR" />
+		<result column="IS_DELETED" property="isDeleted" jdbcType="CHAR" />
+		<result column="VERSION" property="version" jdbcType="DECIMAL" />
+		<association property="creator" javaType="com.haoyu.sip.core.entity.User">
+			<id property="id" column="CREATOR_ID" />
+			<result property="realName" column="CREATOR_REAL_NAME" />
+		</association>
+	</resultMap>
+
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="TextBookRelationResult">
+		select
+		TBE.ID,TBE.TEXT_BOOK_TYPE_CODE,TBE.TEXT_BOOK_VALUE,TBE.TEXT_BOOK_NAME,TBE.PARENT_VALUE,TBE.PARENT_NAME
+		from TEXT_BOOK_RELATION TBR
+		join TEXT_BOOK_ENTRY TBE where TBR.TEXT_BOOK_ENTRY_ID = TBE.ID
+		where TBR.IS_DELETED = 'N'
+		and TBR.PARENT_CODE = #{parentCode}
+	</select>
+
+	<select id="select" parameterType="com.haoyu.sip.textbook.entity.TextBookRelation" resultMap="TextBookRelationResult">
+		select
+		TBR.ID,TBR.TEXT_BOOK_ENTRY_ID,TBR.PARENT_CODE
+		,
+		TBE.TEXT_BOOK_TYPE_CODE
+		from TEXT_BOOK_RELATION TBR
+		join TEXT_BOOK_ENTRY TBE on TBE.ID = TBR.TEXT_BOOK_ENTRY_ID
+		where TBR.IS_DELETED='N'
+		<if test="textBookEntryId!=null">
+			and TBR.TEXT_BOOK_ENTRY_ID = #{textBookEntryId}
+		</if>
+		<if test="textBookTypeCode!=null and textBookTypeCode!=''">
+			and TBE.TEXT_BOOK_TYPE_CODE = #{textBookTypeCode}
+		</if>
+	</select>
+
+
+	<!-- <select id="selectEntry" parameterType="java.util.Map" resultMap="textBookEntryResultMap"> select TBE.ID,TBE.TEXT_BOOK_TYPE_CODE,TBE.TEXT_BOOK_VALUE,TBE.TEXT_BOOK_NAME,TBE.PARENT_VALUE,TBE.PARENT_NAME <if test="textBookTypeCode == SECTION"> , TBE1.ID CHILD_ID,TBE1.TEXT_BOOK_TYPE_CODE CHILD_TYPE_CODE,TBE1.TEXT_BOOK_VALUE CHILD_VALUE,TBE1.TEXT_BOOK_NAME CHILD_NAME </if> from TEXT_BOOK_RELATION TBR join TEXT_BOOK_ENTRY TBE on TBR.TEXT_BOOK_ENTRY_ID = TBE.ID <if test="textBookTypeCode == SECTION"> join TEXT_BOOK_ENTRY TBE1 on TBE1.PARENT_VALUE = TBE.TEXT_BOOK_VALUE and EXISTS ( SELECT 1 FROM TEXT_BOOK_RELATION TBR JOIN TEXT_BOOK_ENTRY TBE ON TBR.TEXT_BOOK_ENTRY_ID = TBE. ID AND TBE.PARENT_VALUE IS NOT NULL <where> <if test="stage!=null"> TBR.PARENT_CODE like '%"stage":${stage}%' </if> <if test="subject!=null"> and TBR.PARENT_CODE like '%"subject":${subject}%' </if> <if test="grade!=null"> and TBR.PARENT_CODE like '%"grade":${grade}%' </if> <if test="version!=null"> and TBR.PARENT_CODE 
+		like '%"version":${version}%' </if> <if test="textBookTypeCode"> and TBE.TEXT_BOOK_TYPE_CODE = #{textBookTypeCode} </if> </where> and TBE1.id = TBE.id ) </if> <where> <if test="stage!=null"> TBR.PARENT_CODE like '%"stage":${stage}%' </if> <if test="subject!=null"> and TBR.PARENT_CODE like '%"subject":${subject}%' </if> <if test="grade!=null"> and TBR.PARENT_CODE like '%"grade":${grade}%' </if> <if test="version!=null"> and TBR.PARENT_CODE like '%"version":${version}%' </if> <if test="textBookTypeCode"> and TBE.TEXT_BOOK_TYPE_CODE = #{textBookTypeCode} </if> </where> </select> -->
+
+
+
+	<update id="deleteByLogic" parameterType="java.lang.String">
+		update TEXT_BOOK_RELATION TBR
+		set TBR.IS_DELETED = 'Y'
+		where TBR.ID=#{id,jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteByPhysics" parameterType="java.lang.String">
+		delete from TEXT_BOOK_RELATION TBR
+		where TBR.ID = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.haoyu.sip.textbook.entity.TextBookEntry">
+		insert into TEXT_BOOK_RELATION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				ID,
+			</if>
+			<if test="textBookTypeCode!=null">
+				TEXT_BOOK_TYPE_CODE,
+			</if>
+			<if test="textBookEntryId!=null">
+				TEXT_BOOK_ENTRY_ID,
+			</if>
+			<if test="parentCode!=null">
+				PARENT_CODE,
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				CREATOR,
+			</if>
+			<if test="updatedby!=null">
+				UPDATEDBY,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="isDeleted != null">
+				IS_DELETED,
+			</if>
+			<if test="version != null">
+				VERSION
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="textBookTypeCode!=null">
+				#{textBookTypeCode},
+			</if>
+			<if test="textBookEntryId!=null">
+				#{textBookEntryId},
+			</if>
+			<if test="parentCode!=null">
+				#{parentCode},
+			</if>
+			<if test="creator!=null and creator.id!=null">
+				#{creator.id},
+			</if>
+			<if test="updatedby!=null">
+				#{updatedby},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted},
+			</if>
+			<if test="version != null">
+				#{version}
+			</if>
+
+		</trim>
+
+	</insert>
+
+</mapper>

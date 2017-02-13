@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoyu.sip.echarts.dao.impl.mybatis.StatChartsParamMapper" >
+  <resultMap id="StatChartsParamResultMap" type="com.haoyu.sip.echarts.entity.StatChartsParam" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="REQUEST_PARAM" property="requestParam" jdbcType="VARCHAR" />
+    <result column="LAST_CACHE_TIME" property="lastCacheTime" jdbcType="BIGINT" />
+   	<association property="statCharts" javaType="com.haoyu.sip.echarts.entity.StatCharts">
+    	<id column="STAT_CHARTS_ID" property="id" jdbcType="VARCHAR"/>
+    	<result column="CACHE_EXPIRE_TIME" property="cacheExpireTime" jdbcType="INTEGER"/>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M.ID,M.REQUEST_PARAM,M.LAST_CACHE_TIME,SC.CACHE_EXPIRE_TIME,M.STAT_CHARTS_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="StatChartsParamResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List"/>
+    from STAT_CHARTS SC
+    LEFT JOIN STAT_CHARTS_PARAM M
+    ON M.STAT_CHARTS_ID=SC.ID
+    where M.ID=#{id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.haoyu.sip.echarts.entity.StatChartsParam">
+  	insert into STAT_CHARTS_PARAM(ID,STAT_CHARTS_ID,REQUEST_PARAM,LAST_CACHE_TIME)
+  	values(#{id,jdbcType=VARCHAR},#{statCharts.id,jdbcType=VARCHAR},#{requestParam,jdbcType=VARCHAR},#{lastCacheTime,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.haoyu.sip.echarts.entity.StatChartsParam">
+     update STAT_CHARTS_PARAM
+     set LAST_CACHE_TIME=#{lastCacheTime}
+     where ID=#{id,jdbcType=VARCHAR}
+  </update>
+  <delete id="deleteByPhysics" parameterType="com.haoyu.sip.echarts.entity.StatChartsParam">
+  	delete STAT_CHARTS_PARAM
+    where ID=#{id,jdbcType=VARCHAR}
+  </delete>
+</mapper>
